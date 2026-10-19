@@ -1,0 +1,19 @@
+# OS / エディタ
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# 環境変数(.env.exampleだけはコミットする)
+.env
+.env.*
+!.env.example
+
+# 依存パッケージ・ビルド成果物
+node_modules/
+vendor/
+.next/
+coverage/
+
+# ログ
+*.log
