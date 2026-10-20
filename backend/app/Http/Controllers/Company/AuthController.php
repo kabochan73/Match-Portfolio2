@@ -6,6 +6,7 @@ use App\Http\Controllers\Concerns\ThrottlesLogins;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CompanyResource;
 use App\Models\Company;
+use Illuminate\Auth\SessionGuard;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -56,7 +57,9 @@ class AuthController extends Controller
 
         $this->ensureIsNotRateLimited($request, self::GUARD);
 
-        if (! Auth::guard(self::GUARD)->validate($credentials)) {
+        $guard = $this->sessionGuard();
+
+        if (! $guard->validate($credentials)) {
             $this->hitRateLimiter($request, self::GUARD);
 
             // 「メールアドレスが未登録」と「パスワードが違う」を区別しない(アカウントの存在を推測されないようにするため)
@@ -68,7 +71,7 @@ class AuthController extends Controller
         $this->clearRateLimiter($request, self::GUARD);
 
         /** @var Company $company */
-        $company = Auth::guard(self::GUARD)->getLastAttempted();
+        $company = $guard->getLastAttempted();
 
         $this->startSession($request, $company);
 
@@ -94,6 +97,18 @@ class AuthController extends Controller
     public function me(Request $request): CompanyResource
     {
         return new CompanyResource($request->user(self::GUARD));
+    }
+
+    /**
+     * このコントローラーで使うセッションガード。
+     * Auth::guard()の戻り値はインターフェース型のため、SessionGuard固有のメソッド(getLastAttempted)を型安全に使えるようにする
+     */
+    private function sessionGuard(): SessionGuard
+    {
+        $guard = Auth::guard(self::GUARD);
+        assert($guard instanceof SessionGuard);
+
+        return $guard;
     }
 
     /**
