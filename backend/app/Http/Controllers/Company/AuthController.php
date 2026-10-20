@@ -34,6 +34,9 @@ class AuthController extends Controller
             // 求職者(users)とは別テーブルのため、同じメールアドレスでも登録できる
             'email' => ['required', 'string', 'email', 'max:255', 'unique:companies'],
             'password' => ['required', 'confirmed', Password::defaults()],
+        ], attributes: [
+            // 共通の項目名では`name`が「名前」のため、企業では「会社名」と表示する
+            'name' => '会社名',
         ]);
 
         $company = Company::create($validated);

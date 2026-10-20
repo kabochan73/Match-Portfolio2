@@ -46,7 +46,7 @@ describe('register', function () {
     it('returns 422 when required fields are missing', function () {
         $this->postJson('/api/company/register', [])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['name', 'email', 'password']);
+            ->assertJsonValidationErrors(['name' => '会社名は必須項目です。', 'email', 'password']);
     });
 
     it('logs out the seeker session when a company registers', function () {
