@@ -68,7 +68,7 @@ describe('reset password', function () {
             'email' => 'hr@example.com',
             'password' => 'new-password123',
             'password_confirmation' => 'new-password123',
-        ])->assertUnprocessable()->assertJsonValidationErrors('email');
+        ])->assertUnprocessable()->assertJsonValidationErrors(['email' => 'このパスワード再設定トークンは無効です。']);
 
         expect(Hash::check('password', $company->fresh()->password))->toBeTrue();
     });

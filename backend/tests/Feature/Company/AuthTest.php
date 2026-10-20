@@ -40,7 +40,7 @@ describe('register', function () {
 
         $this->postJson('/api/company/register', validCompanyRegistration())
             ->assertUnprocessable()
-            ->assertJsonValidationErrors('email');
+            ->assertJsonValidationErrors(['email' => '指定のメールアドレスは既に使用されています。']);
     });
 
     it('returns 422 when required fields are missing', function () {
@@ -74,7 +74,7 @@ describe('login', function () {
 
         $this->postJson('/api/company/login', ['email' => 'hr@example.com', 'password' => 'wrong-password'])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors('email');
+            ->assertJsonValidationErrors(['email' => 'メールアドレスまたはパスワードが正しくありません。']);
 
         $this->assertGuest('company');
     });
@@ -88,7 +88,7 @@ describe('login', function () {
 
         $this->postJson('/api/company/login', ['email' => 'hr@example.com', 'password' => 'password'])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors('email');
+            ->assertJsonValidationErrors(['email' => 'ログインの試行回数が多すぎます。']);
 
         $this->assertGuest('company');
     });

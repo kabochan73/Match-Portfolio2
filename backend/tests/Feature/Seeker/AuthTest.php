@@ -34,7 +34,7 @@ describe('register', function () {
 
         $this->postJson('/api/seeker/register', validRegistration(['birth_date' => '2008-10-21']))
             ->assertUnprocessable()
-            ->assertJsonValidationErrors('birth_date');
+            ->assertJsonValidationErrors(['birth_date' => '18歳以上の方のみ登録できます。']);
     });
 
     it('accepts a seeker who turns 18 today and one who is still 60', function (string $birthDate) {
@@ -52,7 +52,7 @@ describe('register', function () {
 
         $this->postJson('/api/seeker/register', validRegistration(['birth_date' => '1965-10-20']))
             ->assertUnprocessable()
-            ->assertJsonValidationErrors('birth_date');
+            ->assertJsonValidationErrors(['birth_date' => '60歳以下の方のみ登録できます。']);
     });
 
     it('returns 422 when the email is already registered', function () {
@@ -60,13 +60,13 @@ describe('register', function () {
 
         $this->postJson('/api/seeker/register', validRegistration())
             ->assertUnprocessable()
-            ->assertJsonValidationErrors('email');
+            ->assertJsonValidationErrors(['email' => '指定のメールアドレスは既に使用されています。']);
     });
 
     it('returns 422 when required fields are missing', function () {
         $this->postJson('/api/seeker/register', [])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['name', 'email', 'password', 'birth_date']);
+            ->assertJsonValidationErrors(['name', 'email' => 'メールアドレスは必須項目です。', 'password', 'birth_date']);
     });
 
     it('logs out the company session when a seeker registers', function () {
@@ -94,7 +94,7 @@ describe('login', function () {
 
         $this->postJson('/api/seeker/login', ['email' => 'taro@example.com', 'password' => 'wrong-password'])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors('email');
+            ->assertJsonValidationErrors(['email' => 'メールアドレスまたはパスワードが正しくありません。']);
 
         $this->assertGuest('web');
     });
@@ -108,7 +108,7 @@ describe('login', function () {
 
         $this->postJson('/api/seeker/login', ['email' => 'taro@example.com', 'password' => 'password'])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors('email');
+            ->assertJsonValidationErrors(['email' => 'ログインの試行回数が多すぎます。']);
 
         $this->assertGuest('web');
     });
