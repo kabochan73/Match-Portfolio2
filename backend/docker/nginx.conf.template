@@ -1,0 +1,27 @@
+# ${PORT}はentrypoint.shがenvsubstで実際のポート番号に置き換える
+# (Railwayはコンテナ起動時にPORT環境変数を渡してくるため、ビルド時には固定できない)
+server {
+    listen ${PORT};
+    server_name _;
+    root /var/www/html/public;
+    index index.php;
+
+    # 画像アップロードの上限。Laravel側のバリデーションより少し大きくしておく
+    client_max_body_size 20m;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass 127.0.0.1:9000;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    # .well-known以外の隠しファイル(.env等)への直接アクセスを禁止する
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+}

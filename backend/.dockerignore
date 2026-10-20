@@ -1,0 +1,23 @@
+# 依存パッケージはイメージ内でcomposer installし直す
+vendor
+node_modules
+
+# 環境変数はイメージに含めず、実行時に渡す
+.env
+.env.*
+!.env.example
+
+# 実行時に生成されるファイル
+storage/logs/*
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*.php
+database/*.sqlite
+.phpunit.result.cache
+
+# AIツール(Laravel Boost)の設定。本番では使わない
+.claude
+.mcp.json
+boost.json
+CLAUDE.md
