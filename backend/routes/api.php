@@ -3,6 +3,7 @@
 use App\Http\Controllers\Company\AuthController as CompanyAuthController;
 use App\Http\Controllers\Company\PasswordResetController as CompanyPasswordResetController;
 use App\Http\Controllers\Seeker\AuthController as SeekerAuthController;
+use App\Http\Controllers\Seeker\AvatarController as SeekerAvatarController;
 use App\Http\Controllers\Seeker\PasswordResetController as SeekerPasswordResetController;
 use App\Http\Controllers\Seeker\ProfileController as SeekerProfileController;
 use Illuminate\Support\Facades\Route;
@@ -20,6 +21,8 @@ Route::prefix('seeker')->group(function () {
 
         Route::get('profile', [SeekerProfileController::class, 'show']);
         Route::put('profile', [SeekerProfileController::class, 'update']);
+        Route::post('avatar', [SeekerAvatarController::class, 'store']);
+        Route::delete('avatar', [SeekerAvatarController::class, 'destroy']);
     });
 });
 

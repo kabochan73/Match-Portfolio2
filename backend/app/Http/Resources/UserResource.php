@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\User;
+use App\Services\ImageStorage;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -28,7 +29,8 @@ class UserResource extends JsonResource
             'comment' => $this->comment,
             'portfolio_url' => $this->portfolio_url,
             'birth_date' => $this->birth_date->toDateString(),
-            'avatar_path' => $this->avatar_path,
+            // 保存場所(パス)ではなく、画面にそのまま表示できるURLを返す
+            'avatar_url' => app(ImageStorage::class)->url($this->avatar_path),
             'work_experiences' => WorkExperienceResource::collection($this->whenLoaded('workExperiences')),
             'educations' => EducationResource::collection($this->whenLoaded('educations')),
             'certifications' => CertificationResource::collection($this->whenLoaded('certifications')),
