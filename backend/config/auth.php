@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Company;
 use App\Models\User;
 
 return [
@@ -38,9 +39,16 @@ return [
     */
 
     'guards' => [
+        // 求職者
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
+        ],
+
+        // 企業。求職者とは別テーブル・別ガードで認証する
+        'company' => [
+            'driver' => 'session',
+            'provider' => 'companies',
         ],
     ],
 
@@ -65,6 +73,11 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', User::class),
+        ],
+
+        'companies' => [
+            'driver' => 'eloquent',
+            'model' => Company::class,
         ],
 
         // 'users' => [
@@ -96,6 +109,14 @@ return [
         'users' => [
             'provider' => 'users',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        // 同じメールアドレスが求職者・企業の両方に存在しうるため、トークンのテーブルを分ける
+        'companies' => [
+            'provider' => 'companies',
+            'table' => 'company_password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
         ],

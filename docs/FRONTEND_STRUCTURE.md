@@ -4,7 +4,11 @@ Next.js(App Router)のフォルダ構成と、ページごとのレンダリン�
 
 ## 1. 基本方針
 
-- **認証はハイブリッド方式**: データの読み取り(GET)はServer Componentから、更新(POST/PUT/DELETE)はブラウザから直接Laravel APIを呼ぶ。BFF(中継層)は挟まない
+- **認証はハイブリッド方式**: データの読み取り(GET)はServer Componentから、更新(POST/PUT/DELETE)はブラウザからLaravel APIを呼ぶ。独自のBFF(API Route等で書く中継処理)は持たない
+- **ブラウザからは同じドメインの`/api`経由で呼ぶ**: Railwayの`*.up.railway.app`ではフロントとバックエンドが別サイト扱いになり、ログインのCookieが送られない。そのため`next.config.ts`のrewritesで、`/api/*`と`/sanctum/*`をLaravelへそのまま中継する(ローカルも同じ構成)
+  - ブラウザ → `フロントのドメイン/api/...` → (rewrites) → Laravel
+  - Server Component → Next.jsのサーバーから`API_INTERNAL_URL`のLaravelを直接呼ぶ(CookieとOriginヘッダーを転送)
+  - CORSの設定は不要(ブラウザから見て常に同じドメインのため)
 - **SC/CCの判断基準**: 誰が見ても同じ内容の公開ページはSC(Server Component)にしてキャッシュする。本人専用のログイン後ページは、共有キャッシュの対象にならないため、CC(Client Component)とTanStack Queryで扱う
 - **`app/`にはルーティング用のファイル(page / layout)だけを置く**。UIは`components/`、データ取得・スキーマは`lib/`に置く
 
@@ -26,7 +30,7 @@ src/
 │   │   ├── (auth)/                login, register, forgot-password, reset-password
 │   │   └── (protected)/           layout.tsxで認証ガード
 │   │       └── profile/edit, job-postings/..., likes/..., notifications
-│   └── api/revalidate/            Laravelから呼ぶキャッシュ再検証用のRoute Handler
+│   └── internal/revalidate/       Laravelから呼ぶキャッシュ再検証用のRoute Handler(/apiはLaravelへの中継に使うため、別のパスに置く)
 ├── components/
 │   ├── ui/                        共通部品(Button, Input, Tag, Badge, Card, Dialog, Tabs等)。デザイン方針をここに集約する
 │   ├── layout/                    Header(公開 / 求職者 / 企業)、Footer
@@ -35,7 +39,7 @@ src/
 │   ├── seeker/                    求職者専用
 │   └── company/                   企業専用
 ├── lib/
-│   ├── api/                       client.ts(ブラウザ用) / server.ts(SC用。Cookieと Originヘッダーを転送) / config.ts
+│   ├── api/                       client.ts(ブラウザ用。同じドメインの/apiを呼ぶ) / server.ts(SC用。Laravelを直接呼び、CookieとOriginヘッダーを転送) / config.ts
 │   ├── query/                     QueryClient
 │   ├── jobs/ seeker/ company/     API呼び出し関数、Zodスキーマ、queryOptions
 │   └── utils/                     cn()(clsx + tailwind-merge)、日付・給与の整形
@@ -69,7 +73,7 @@ src/
 
 | データ | 再検証のタイミング | 理由 |
 |---|---|---|
-| 求人・企業ページの内容 | 企業が編集・公開・募集終了したとき、Laravelから`/api/revalidate`を呼んで該当タグを即時に再検証する | 内容の変更はすぐ反映したい |
+| 求人・企業ページの内容 | 企業が編集・公開・募集終了したとき、Laravelから`/internal/revalidate`を呼んで該当タグを即時に再検証する | 内容の変更はすぐ反映したい |
 | いいね数・人気順 | 時間で再検証する(5分) | いいねのたびに再検証するとキャッシュの意味が薄れるため、最大5分の遅れを許容する |
 
 - Next.js 16では`revalidateTag`の第2引数が必須。外部(Laravel)から即時反映したい場合は`{ expire: 0 }`を使う
