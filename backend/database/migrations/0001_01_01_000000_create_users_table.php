@@ -11,12 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // 求職者。メール認証は行わないため、email_verified_atは持たない
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('comment', 200)->nullable();
+            $table->string('portfolio_url')->nullable();
+            // 18歳以上60歳以下の制限は、日付によって範囲が変わるため登録時のバリデーションで行う
+            $table->date('birth_date');
+            $table->string('avatar_path')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
