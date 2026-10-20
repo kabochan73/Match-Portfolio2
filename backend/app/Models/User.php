@@ -42,4 +42,24 @@ class User extends Authenticatable
     {
         return $this->hasMany(WorkExperience::class);
     }
+
+    /**
+     * 学歴
+     *
+     * @return HasMany<Education, $this>
+     */
+    public function educations(): HasMany
+    {
+        return $this->hasMany(Education::class);
+    }
+
+    /**
+     * 資格
+     *
+     * @return HasMany<Certification, $this>
+     */
+    public function certifications(): HasMany
+    {
+        return $this->hasMany(Certification::class);
+    }
 }
