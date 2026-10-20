@@ -115,15 +115,20 @@
 |---|---|---|---|
 | id | bigint | PK | |
 | name | string | unique, not null | 例: Laravel |
-| group_name | string | not null | 例: フレームワーク |
+| group_name | string | not null | 例: バックエンド |
 | sort_order | unsigned smallint | not null | 表示順 |
 
-初期データ(全リストはシーダー作成時に確定):
-- 言語: PHP, JavaScript, TypeScript, Python, Ruby, Go, Java, Kotlin, Swift, C#, Rust, Dart
-- フレームワーク: Laravel, Ruby on Rails, Django, Spring Boot, React, Next.js, Vue.js, Nuxt, Flutter
-- インフラ・クラウド: AWS, GCP, Azure, Docker, Kubernetes, Terraform
-- データベース: MySQL, PostgreSQL, Redis, MongoDB
+初期データ(46件。`TechStackSeeder`):
+- 言語: PHP, JavaScript, TypeScript, Python, Ruby, Go, Java, Kotlin, Swift, C#, Rust, Dart, Scala, C++
+- バックエンド: Laravel, Ruby on Rails, Django, FastAPI, Spring Boot, Express, NestJS, .NET
+- フロントエンド: React, Next.js, Vue.js, Nuxt, Angular, Svelte
+- モバイル: Flutter, React Native
+- インフラ・クラウド: AWS, GCP, Azure, Docker, Kubernetes, Terraform, Firebase
+- データベース: MySQL, PostgreSQL, Redis, MongoDB, BigQuery
+- AI・機械学習: TensorFlow, PyTorch
 - ツール: Git, GitHub Actions
+
+フレームワークは、検索サイドバーで探しやすいようにバックエンド・フロントエンド・モバイルに分けている。
 
 #### work_styles(働き方マスタ)
 | カラム | 型 | 制約 | 備考 |
