@@ -7,10 +7,10 @@ services:
       target: final
     ports:
       - "8000:8080"
+    # backend/.envはvolumeマウントでLaravelが直接読み込む。env_fileで環境変数としても渡すと、
+    # テスト時にphpunit.xmlの値(テスト用DB等)より優先されてしまうため、渡さない
     environment:
       PORT: "8080"
-    env_file:
-      - ./backend/.env
     volumes:
       - ./backend:/var/www/html
     depends_on:
