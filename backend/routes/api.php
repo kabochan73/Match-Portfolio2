@@ -4,6 +4,7 @@ use App\Http\Controllers\Company\AuthController as CompanyAuthController;
 use App\Http\Controllers\Company\PasswordResetController as CompanyPasswordResetController;
 use App\Http\Controllers\Seeker\AuthController as SeekerAuthController;
 use App\Http\Controllers\Seeker\PasswordResetController as SeekerPasswordResetController;
+use App\Http\Controllers\Seeker\ProfileController as SeekerProfileController;
 use Illuminate\Support\Facades\Route;
 
 // 求職者本人の操作(/api/seeker/...)
@@ -16,6 +17,8 @@ Route::prefix('seeker')->group(function () {
     Route::middleware('auth:web')->group(function () {
         Route::post('logout', [SeekerAuthController::class, 'logout']);
         Route::get('me', [SeekerAuthController::class, 'me']);
+
+        Route::get('profile', [SeekerProfileController::class, 'show']);
     });
 });
 
