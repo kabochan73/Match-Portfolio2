@@ -44,7 +44,7 @@ return [
     'email' => ':attributeは、有効なメールアドレス形式で指定してください。',
     'encoding' => ':attributeは、:encodingでエンコードされている必要があります。',
     'ends_with' => ':attributeの終わりは「:values」である必要があります。',
-    'enum' => '選択した :attributeは 無効です。',
+    'enum' => '選択された:attributeは無効です。',
     'exists' => '選択された:attributeは、有効ではありません。',
     'extensions' => ':attribute には、次のいずれかの拡張子が必要です: :values',
     'file' => ':attributeには、ファイル形式を指定してください。',
@@ -177,6 +177,15 @@ return [
             'mimes' => 'アイコン画像には、JPEG・PNG・WebPの画像を指定してください。',
             'max' => 'アイコン画像は、5MB以下のファイルを指定してください。',
         ],
+        // 職歴の年月。「Y-m」形式や基準の年月(例: 2026-10)をそのまま見せても分かりにくいため、言い換える
+        'started_on' => [
+            'date_format' => '入社年月は、2024-04のような年月で指定してください。',
+            'before_or_equal' => '入社年月に、未来の年月は指定できません。',
+        ],
+        'ended_on' => [
+            'date_format' => '退社年月は、2024-04のような年月で指定してください。',
+            'before_or_equal' => '退社年月に、未来の年月は指定できません。',
+        ],
     ],
 
     /*
@@ -198,5 +207,9 @@ return [
         'comment' => '自己紹介',
         'portfolio_url' => 'ポートフォリオURL',
         'avatar' => 'アイコン画像',
+        'company_name' => '会社名',
+        'started_on' => '入社年月',
+        'ended_on' => '退社年月',
+        'employment_type' => '雇用形態',
     ],
 ];

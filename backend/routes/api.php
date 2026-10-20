@@ -6,6 +6,7 @@ use App\Http\Controllers\Seeker\AuthController as SeekerAuthController;
 use App\Http\Controllers\Seeker\AvatarController as SeekerAvatarController;
 use App\Http\Controllers\Seeker\PasswordResetController as SeekerPasswordResetController;
 use App\Http\Controllers\Seeker\ProfileController as SeekerProfileController;
+use App\Http\Controllers\Seeker\WorkExperienceController as SeekerWorkExperienceController;
 use Illuminate\Support\Facades\Route;
 
 // 求職者本人の操作(/api/seeker/...)
@@ -23,6 +24,8 @@ Route::prefix('seeker')->group(function () {
         Route::put('profile', [SeekerProfileController::class, 'update']);
         Route::post('avatar', [SeekerAvatarController::class, 'store']);
         Route::delete('avatar', [SeekerAvatarController::class, 'destroy']);
+
+        Route::apiResource('work-experiences', SeekerWorkExperienceController::class)->only(['store', 'update', 'destroy']);
     });
 });
 
