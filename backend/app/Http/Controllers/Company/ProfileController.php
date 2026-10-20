@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Company\CompanyProfileRequest;
 use App\Http\Resources\CompanyResource;
 use App\Models\Company;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 /**
  * 企業ページ(企業本人による閲覧・編集)
@@ -30,5 +32,24 @@ class ProfileController extends Controller
         ]);
 
         return new CompanyResource($company);
+    }
+
+    /**
+     * 企業ページの項目と、技術スタック・働き方の選択をまとめて更新する。
+     * 途中で失敗して一部だけ更新された状態にならないよう、1つのトランザクションで行う
+     */
+    public function update(CompanyProfileRequest $request): CompanyResource
+    {
+        /** @var Company $company */
+        $company = $request->user('company');
+
+        DB::transaction(function () use ($request, $company) {
+            $company->update($request->profileAttributes());
+            // 送られたIDの状態にそろえる(外したタグは削除、新しいタグは追加)
+            $company->techStacks()->sync($request->validated('tech_stack_ids'));
+            $company->workStyles()->sync($request->validated('work_style_ids'));
+        });
+
+        return $this->show($request);
     }
 }

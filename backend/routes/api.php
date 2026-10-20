@@ -46,5 +46,6 @@ Route::prefix('company')->group(function () {
         Route::get('me', [CompanyAuthController::class, 'me']);
 
         Route::get('profile', [CompanyProfileController::class, 'show']);
+        Route::put('profile', [CompanyProfileController::class, 'update']);
     });
 });
