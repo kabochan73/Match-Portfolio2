@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Company\AuthController as CompanyAuthController;
 use App\Http\Controllers\Company\AvatarController as CompanyAvatarController;
+use App\Http\Controllers\Company\CompanyImageController;
 use App\Http\Controllers\Company\PasswordResetController as CompanyPasswordResetController;
 use App\Http\Controllers\Company\ProfileController as CompanyProfileController;
 use App\Http\Controllers\Seeker\AuthController as SeekerAuthController;
@@ -50,5 +51,9 @@ Route::prefix('company')->group(function () {
         Route::put('profile', [CompanyProfileController::class, 'update']);
         Route::post('avatar', [CompanyAvatarController::class, 'store']);
         Route::delete('avatar', [CompanyAvatarController::class, 'destroy']);
+
+        Route::apiResource('images', CompanyImageController::class)
+            ->only(['store', 'destroy'])
+            ->parameters(['images' => 'companyImage']);
     });
 });
