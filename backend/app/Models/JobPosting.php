@@ -93,4 +93,14 @@ class JobPosting extends Model
     {
         return $this->belongsToMany(TechStack::class);
     }
+
+    /**
+     * 受け取ったいいね(=応募)
+     *
+     * @return HasMany<Like, $this>
+     */
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class);
+    }
 }
