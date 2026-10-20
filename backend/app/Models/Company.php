@@ -7,6 +7,8 @@ use Database\Factories\CompanyFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -46,5 +48,35 @@ class Company extends Authenticatable
             'member_count' => 'integer',
             'prefecture' => Prefecture::class,
         ];
+    }
+
+    /**
+     * 企業ページの写真ギャラリー(最大5枚、登録順に表示)
+     *
+     * @return HasMany<CompanyImage, $this>
+     */
+    public function images(): HasMany
+    {
+        return $this->hasMany(CompanyImage::class);
+    }
+
+    /**
+     * 企業ページの技術スタック
+     *
+     * @return BelongsToMany<TechStack, $this>
+     */
+    public function techStacks(): BelongsToMany
+    {
+        return $this->belongsToMany(TechStack::class);
+    }
+
+    /**
+     * 企業ページの働き方
+     *
+     * @return BelongsToMany<WorkStyle, $this>
+     */
+    public function workStyles(): BelongsToMany
+    {
+        return $this->belongsToMany(WorkStyle::class);
     }
 }
