@@ -72,4 +72,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Like::class);
     }
+
+    /**
+     * 求人のブックマーク
+     *
+     * @return HasMany<Bookmark, $this>
+     */
+    public function bookmarks(): HasMany
+    {
+        return $this->hasMany(Bookmark::class);
+    }
 }
