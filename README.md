@@ -31,4 +31,33 @@ IT・エンジニア職に特化した求人マッチングサービス。Wanted
 
 ## ローカル環境の起動
 
-(環境構築後に追記)
+必要なもの: Docker Desktop
+
+```sh
+# 1. 環境変数ファイルを用意する
+cp backend/.env.example backend/.env
+
+# 2. 起動する(初回はイメージのビルドに数分かかる)
+docker compose up -d --build
+
+# 3. Laravelのアプリケーションキーを生成する(初回のみ)
+docker compose exec app php artisan key:generate
+```
+
+| サービス | URL |
+| --- | --- |
+| フロントエンド(Next.js) | http://localhost:3000 |
+| API(Laravel) | http://localhost:8000 |
+| PostgreSQL | localhost:5432(ユーザー・パスワードともに`postgres`) |
+
+マイグレーションは`app`コンテナの起動時に自動で実行される。
+
+## テスト
+
+バックエンドのテストはPostgreSQLのテスト専用DB(`tech_match_test`)で実行するため、コンテナ内で実行する。
+
+```sh
+docker compose exec app php artisan test
+```
+
+ホストのPHPで直接`php artisan test`を実行すると、DBのホスト名`db`に接続できず失敗する。
