@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Company\AuthController as CompanyAuthController;
+use App\Http\Controllers\Company\PasswordResetController as CompanyPasswordResetController;
 use App\Http\Controllers\Seeker\AuthController as SeekerAuthController;
 use App\Http\Controllers\Seeker\PasswordResetController as SeekerPasswordResetController;
 use Illuminate\Support\Facades\Route;
@@ -22,6 +23,8 @@ Route::prefix('seeker')->group(function () {
 Route::prefix('company')->group(function () {
     Route::post('register', [CompanyAuthController::class, 'register']);
     Route::post('login', [CompanyAuthController::class, 'login']);
+    Route::post('forgot-password', [CompanyPasswordResetController::class, 'forgotPassword']);
+    Route::post('reset-password', [CompanyPasswordResetController::class, 'resetPassword']);
 
     Route::middleware('auth:company')->group(function () {
         Route::post('logout', [CompanyAuthController::class, 'logout']);
