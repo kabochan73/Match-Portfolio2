@@ -51,6 +51,16 @@ class Company extends Authenticatable
     }
 
     /**
+     * 求人
+     *
+     * @return HasMany<JobPosting, $this>
+     */
+    public function jobPostings(): HasMany
+    {
+        return $this->hasMany(JobPosting::class);
+    }
+
+    /**
      * 企業ページの写真ギャラリー(最大5枚、登録順に表示)
      *
      * @return HasMany<CompanyImage, $this>
