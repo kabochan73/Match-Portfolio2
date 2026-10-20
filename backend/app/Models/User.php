@@ -21,6 +21,22 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
+     * 生年月日のバリデーションルール(18歳以上60歳以下)。会員登録とプロフィール編集で共通利用する。
+     * 基準日がリクエストごとに変わるため、呼ばれるたびに計算する
+     *
+     * @return list<string>
+     */
+    public static function birthDateRules(): array
+    {
+        return [
+            'required',
+            'date',
+            'before_or_equal:'.now()->subYears(18)->toDateString(),
+            'after:'.now()->subYears(61)->toDateString(),
+        ];
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

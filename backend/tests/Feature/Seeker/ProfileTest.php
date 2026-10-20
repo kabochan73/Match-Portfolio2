@@ -58,6 +58,84 @@ describe('show', function () {
     });
 });
 
+describe('update', function () {
+    it('updates the basic information', function () {
+        $user = User::factory()->create();
+
+        $this->actingAs($user, 'web')
+            ->putJson('/api/seeker/profile', [
+                'name' => '山田 花子',
+                'birth_date' => '1995-05-05',
+                'comment' => 'Laravelが得意です。',
+                'portfolio_url' => 'https://github.com/example',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.name', '山田 花子')
+            ->assertJsonPath('data.birth_date', '1995-05-05');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'name' => '山田 花子',
+            'comment' => 'Laravelが得意です。',
+            'portfolio_url' => 'https://github.com/example',
+        ]);
+    });
+
+    it('clears the optional fields when they are sent as null', function () {
+        $user = User::factory()->create(['comment' => '旧コメント', 'portfolio_url' => 'https://old.example.com']);
+
+        $this->actingAs($user, 'web')
+            ->putJson('/api/seeker/profile', [
+                'name' => $user->name,
+                'birth_date' => $user->birth_date->toDateString(),
+                'comment' => null,
+                'portfolio_url' => null,
+            ])
+            ->assertOk();
+
+        expect($user->fresh())
+            ->comment->toBeNull()
+            ->portfolio_url->toBeNull();
+    });
+
+    it('does not change the email even if it is sent', function () {
+        $user = User::factory()->create(['email' => 'taro@example.com']);
+
+        $this->actingAs($user, 'web')
+            ->putJson('/api/seeker/profile', [
+                'name' => $user->name,
+                'birth_date' => $user->birth_date->toDateString(),
+                'email' => 'changed@example.com',
+            ])
+            ->assertOk();
+
+        expect($user->fresh()->email)->toBe('taro@example.com');
+    });
+
+    it('returns 422 with Japanese messages for invalid input', function () {
+        $this->travelTo('2026-10-20');
+        $user = User::factory()->create();
+
+        $this->actingAs($user, 'web')
+            ->putJson('/api/seeker/profile', [
+                'name' => $user->name,
+                'birth_date' => '2010-01-01',
+                'comment' => str_repeat('あ', 201),
+                'portfolio_url' => 'not-a-url',
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors([
+                'birth_date' => '18歳以上の方のみ登録できます。',
+                'comment' => '自己紹介の文字数は、200文字以下である必要があります。',
+                'portfolio_url' => 'ポートフォリオURLは、有効なURL形式で指定してください。',
+            ]);
+    });
+
+    it('returns 401 when not logged in', function () {
+        $this->putJson('/api/seeker/profile', [])->assertUnauthorized();
+    });
+});
+
 it('does not include work experiences in /me', function () {
     $user = User::factory()->create();
     WorkExperience::factory()->for($user)->create();

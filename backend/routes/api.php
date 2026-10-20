@@ -19,6 +19,7 @@ Route::prefix('seeker')->group(function () {
         Route::get('me', [SeekerAuthController::class, 'me']);
 
         Route::get('profile', [SeekerProfileController::class, 'show']);
+        Route::put('profile', [SeekerProfileController::class, 'update']);
     });
 });
 

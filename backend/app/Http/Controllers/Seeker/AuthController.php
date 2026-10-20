@@ -31,13 +31,7 @@ class AuthController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Password::defaults()],
-            // 18歳以上60歳以下。基準日がリクエストごとに変わるため、その都度計算する
-            'birth_date' => [
-                'required',
-                'date',
-                'before_or_equal:'.now()->subYears(18)->toDateString(),
-                'after:'.now()->subYears(61)->toDateString(),
-            ],
+            'birth_date' => User::birthDateRules(),
         ]);
 
         $user = User::create($validated);

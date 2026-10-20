@@ -31,4 +31,24 @@ class ProfileController extends Controller
 
         return new UserResource($user);
     }
+
+    /**
+     * 基本情報を更新する。メールアドレス・パスワードはここでは変更できない
+     */
+    public function update(Request $request): UserResource
+    {
+        /** @var User $user */
+        $user = $request->user('web');
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'birth_date' => User::birthDateRules(),
+            'comment' => ['nullable', 'string', 'max:200'],
+            'portfolio_url' => ['nullable', 'string', 'url', 'max:255'],
+        ]);
+
+        $user->update($validated);
+
+        return new UserResource($user);
+    }
 }

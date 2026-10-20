@@ -190,5 +190,7 @@ return [
         'password' => 'パスワード',
         'token' => 'トークン',
         'birth_date' => '生年月日',
+        'comment' => '自己紹介',
+        'portfolio_url' => 'ポートフォリオURL',
     ],
 ];
