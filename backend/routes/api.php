@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Company\AuthController as CompanyAuthController;
 use App\Http\Controllers\Company\PasswordResetController as CompanyPasswordResetController;
+use App\Http\Controllers\Company\ProfileController as CompanyProfileController;
 use App\Http\Controllers\Seeker\AuthController as SeekerAuthController;
 use App\Http\Controllers\Seeker\AvatarController as SeekerAvatarController;
 use App\Http\Controllers\Seeker\CertificationController as SeekerCertificationController;
@@ -43,5 +44,7 @@ Route::prefix('company')->group(function () {
     Route::middleware('auth:company')->group(function () {
         Route::post('logout', [CompanyAuthController::class, 'logout']);
         Route::get('me', [CompanyAuthController::class, 'me']);
+
+        Route::get('profile', [CompanyProfileController::class, 'show']);
     });
 });
