@@ -211,5 +211,6 @@ return [
         'started_on' => '入社年月',
         'ended_on' => '退社年月',
         'employment_type' => '雇用形態',
+        'school_name' => '学校名',
     ],
 ];

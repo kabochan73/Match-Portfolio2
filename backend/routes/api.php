@@ -4,6 +4,7 @@ use App\Http\Controllers\Company\AuthController as CompanyAuthController;
 use App\Http\Controllers\Company\PasswordResetController as CompanyPasswordResetController;
 use App\Http\Controllers\Seeker\AuthController as SeekerAuthController;
 use App\Http\Controllers\Seeker\AvatarController as SeekerAvatarController;
+use App\Http\Controllers\Seeker\EducationController as SeekerEducationController;
 use App\Http\Controllers\Seeker\PasswordResetController as SeekerPasswordResetController;
 use App\Http\Controllers\Seeker\ProfileController as SeekerProfileController;
 use App\Http\Controllers\Seeker\WorkExperienceController as SeekerWorkExperienceController;
@@ -26,6 +27,7 @@ Route::prefix('seeker')->group(function () {
         Route::delete('avatar', [SeekerAvatarController::class, 'destroy']);
 
         Route::apiResource('work-experiences', SeekerWorkExperienceController::class)->only(['store', 'update', 'destroy']);
+        Route::apiResource('educations', SeekerEducationController::class)->only(['store', 'update', 'destroy']);
     });
 });
 
