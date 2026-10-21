@@ -4,6 +4,7 @@ use App\Http\Controllers\Company\AuthController as CompanyAuthController;
 use App\Http\Controllers\Company\AvatarController as CompanyAvatarController;
 use App\Http\Controllers\Company\CompanyImageController;
 use App\Http\Controllers\Company\JobPostingController as CompanyJobPostingController;
+use App\Http\Controllers\Company\JobPostingImageController;
 use App\Http\Controllers\Company\JobPostingStatusController;
 use App\Http\Controllers\Company\PasswordResetController as CompanyPasswordResetController;
 use App\Http\Controllers\Company\ProfileController as CompanyProfileController;
@@ -61,5 +62,8 @@ Route::prefix('company')->group(function () {
         Route::apiResource('job-postings', CompanyJobPostingController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
         Route::post('job-postings/{jobPosting}/publish', [JobPostingStatusController::class, 'publish']);
         Route::post('job-postings/{jobPosting}/close', [JobPostingStatusController::class, 'close']);
+        Route::post('job-postings/{jobPosting}/images', [JobPostingImageController::class, 'store']);
+        // URLの求人に属する画像だけを対象にする(別の求人の画像IDなら404)
+        Route::delete('job-postings/{jobPosting}/images/{image}', [JobPostingImageController::class, 'destroy'])->scopeBindings();
     });
 });
