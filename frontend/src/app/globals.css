@@ -1,26 +1,47 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * デザインの基準(docs/design/ の採用案「B改」)。
+ * 色は役割で名前を付け(primary・accent等)、Tailwind標準の色名(skyやblue)とぶつからないようにする。
+ * ダークモードは対応しない。
+ */
+@theme {
+  /* 紺: 枠線・ボタン・見出し・影 */
+  --color-primary: #1c2b4d;
+  /* 赤: NEW・通知バッジ・いいね数など、気づいてほしい要所だけに使う */
+  --color-accent: #c93f35;
+
+  /* 水色: 薄い順に ページ背景 / カードの見出し帯 / ヒーロー */
+  --color-base: #eef6fc;
+  --color-tint: #dceef9;
+  --color-tint-strong: #cfe7f6;
+  /* 水色の線: 点線の囲み・ボタンの影など */
+  --color-line-soft: #9cc8e6;
+
+  /* 文字: 見出し / 本文 / 補足 */
+  --color-ink: #18233d;
+  --color-ink-body: #2c3a57;
+  --color-ink-sub: #4e5d78;
+
+  /* ずらした影(ハードシャドウ)。カード・サイドバーの立体感を出す */
+  --shadow-hard: 6px 6px 0 var(--color-primary);
+  --shadow-hard-sm: 4px 4px 0 var(--color-primary);
+  --shadow-hard-soft: 5px 5px 0 var(--color-line-soft);
+
+  /* 角丸は使わない。rounded-*のテーマを空にし、うっかり書いても効かないようにする */
+  --radius-*: initial;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* フォントはlayout.tsxのnext/fontで読み込み、CSS変数で受け取る */
+  --font-sans: var(--font-zen-kaku-gothic-new), sans-serif;
+  /* 英字・数字(ロゴ・見出しのラベル・金額など) */
+  --font-display:
+    var(--font-space-grotesk), var(--font-zen-kaku-gothic-new), sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-base);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
 }
