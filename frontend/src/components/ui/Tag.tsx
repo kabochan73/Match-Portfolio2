@@ -9,7 +9,7 @@ const variantClasses: Record<TagVariant, string> = {
   solid: "bg-primary px-2 py-0.5 font-bold text-white",
   // 枠線: 技術スタック・働き方(英字が多いためfont-display)
   outline:
-    "border-2 border-primary bg-base px-2 font-display font-medium text-primary",
+    "border-2 border-primary bg-page px-2 font-display font-medium text-primary",
 };
 
 type TagProps = ComponentProps<"span"> & {
