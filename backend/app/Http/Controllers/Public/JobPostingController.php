@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Public;
 
+use App\Enums\JobPostingStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Public\JobSearchRequest;
+use App\Http\Resources\JobPostingResource;
 use App\Http\Resources\JobPostingSummaryResource;
 use App\Models\JobPosting;
 use Illuminate\Database\Eloquent\Builder;
@@ -76,6 +78,26 @@ class JobPostingController extends Controller
         $query->orderByDesc('published_at')->orderByDesc('id');
 
         return JobPostingSummaryResource::collection($query->paginate(self::PER_PAGE));
+    }
+
+    /**
+     * 求人の詳細。公開中に加え、募集終了の求人も表示する(ブックマークや応募状況から開くことがあるため)。
+     * 下書きは、公開前の求人の存在を外部に知らせないよう404にする
+     */
+    public function show(JobPosting $jobPosting): JobPostingResource
+    {
+        abort_if($jobPosting->status === JobPostingStatus::Draft, 404);
+
+        $jobPosting
+            ->load([
+                'company',
+                'jobCategories' => fn ($query) => $query->orderBy('sort_order'),
+                'techStacks' => fn ($query) => $query->orderBy('sort_order'),
+                'images' => fn ($query) => $query->orderBy('id'),
+            ])
+            ->loadCount('likes');
+
+        return new JobPostingResource($jobPosting);
     }
 
     /**

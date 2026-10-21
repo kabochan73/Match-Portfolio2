@@ -41,7 +41,10 @@ class JobPostingResource extends JsonResource
                 'label' => $this->status->label(),
             ],
             'published_at' => $this->published_at?->toIso8601String(),
+            'is_new' => $this->isNew(),
             'updated_at' => $this->updated_at->toIso8601String(),
+            // 求職者向けの詳細でのみ読み込む(メールアドレスを含まない公開用の会社情報)
+            'company' => new PublicCompanyResource($this->whenLoaded('company')),
             'job_categories' => JobCategoryResource::collection($this->whenLoaded('jobCategories')),
             'tech_stacks' => TechStackResource::collection($this->whenLoaded('techStacks')),
             'images' => JobPostingImageResource::collection($this->whenLoaded('images')),

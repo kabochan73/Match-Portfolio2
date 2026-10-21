@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 // 公開API(ログイン不要)
 Route::get('masters', [MasterController::class, 'index']);
 Route::get('jobs', [PublicJobPostingController::class, 'index']);
+Route::get('jobs/{jobPosting}', [PublicJobPostingController::class, 'show']);
 
 // 求職者本人の操作(/api/seeker/...)
 Route::prefix('seeker')->group(function () {
