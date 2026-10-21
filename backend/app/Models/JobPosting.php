@@ -7,6 +7,8 @@ use App\Enums\JobPostingStatus;
 use App\Enums\Prefecture;
 use Database\Factories\JobPostingFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -34,6 +36,29 @@ class JobPosting extends Model
 
     /** 1社が同時に公開できる求人の上限(同じような求人の大量掲載で検索結果を独占されないようにする) */
     public const MAX_PUBLISHED_PER_COMPANY = 10;
+
+    /** 初回公開から何日間「NEW」と表示するか */
+    public const NEW_LABEL_DAYS = 30;
+
+    /**
+     * 初回公開から30日以内か(募集再開ではpublished_atが変わらないため、NEWには戻らない)
+     */
+    public function isNew(): bool
+    {
+        return $this->published_at !== null
+            && $this->published_at->greaterThanOrEqualTo(now()->subDays(self::NEW_LABEL_DAYS));
+    }
+
+    /**
+     * 公開中の求人だけに絞る(求職者向けの検索・詳細で使う)
+     *
+     * @param  Builder<JobPosting>  $query
+     */
+    #[Scope]
+    protected function published(Builder $query): void
+    {
+        $query->where('status', JobPostingStatus::Published);
+    }
 
     /**
      * Get the attributes that should be cast.
