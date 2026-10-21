@@ -33,6 +33,9 @@ class JobPosting extends Model
     /** @use HasFactory<JobPostingFactory> */
     use HasFactory;
 
+    /** 1社が同時に公開できる求人の上限(同じような求人の大量掲載で検索結果を独占されないようにする) */
+    public const MAX_PUBLISHED_PER_COMPANY = 10;
+
     /**
      * Get the attributes that should be cast.
      *
