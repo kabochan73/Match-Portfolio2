@@ -24,9 +24,8 @@ return new class extends Migration
             $table->string('employment_type');
             // 勤務地(都道府県 or リモート)
             $table->string('prefecture');
-            // 給与は月給(円)で統一する。表示のみで絞り込みには使わない
-            $table->unsignedInteger('salary_min');
-            $table->unsignedInteger('salary_max');
+            // 月給(円)。範囲ではなく1つの金額で持つ(求職者が実際の金額を判断しやすいように)。表示のみで絞り込みには使わない
+            $table->unsignedInteger('salary');
             // 選考フロー。ステップ名の配列(1〜6件)
             $table->jsonb('selection_steps');
             $table->string('status')->default('draft');

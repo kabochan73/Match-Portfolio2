@@ -21,10 +21,6 @@ class JobPostingFactory extends Factory
      */
     public function definition(): array
     {
-        // 月給は万円単位で作り、円に変換して保存する
-        $salaryMin = fake()->numberBetween(25, 60);
-        $salaryMax = $salaryMin + fake()->numberBetween(5, 30);
-
         return [
             'company_id' => Company::factory(),
             'title' => fake()->randomElement([
@@ -38,8 +34,8 @@ class JobPostingFactory extends Factory
             'desired_candidate' => fake()->realText(200),
             'employment_type' => fake()->randomElement(EmploymentType::cases()),
             'prefecture' => fake()->randomElement(Prefecture::cases()),
-            'salary_min' => $salaryMin * 10000,
-            'salary_max' => $salaryMax * 10000,
+            // 月給は万円単位で作り、円に変換して保存する
+            'salary' => fake()->numberBetween(25, 80) * 10000,
             'selection_steps' => ['カジュアル面談', '一次面接', '最終面接', '内定'],
             'status' => JobPostingStatus::Draft,
             'published_at' => null,

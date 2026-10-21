@@ -169,14 +169,15 @@
 | desired_candidate | text | not null | 求める人材 |
 | employment_type | string(enum) | not null | `full_time`(正社員) / `contract`(契約社員) / `part_time`(アルバイト) / `freelance`(業務委託) / `internship`(インターン) |
 | prefecture | string(enum) | not null | 勤務地。都道府県に加え「リモート」を含む。検索の絞り込み条件 |
-| salary_min | unsigned integer | not null | 月給の下限(円)。表示のみ、絞り込みには使わない |
-| salary_max | unsigned integer | not null | 月給の上限(円)。表示のみ |
+| salary | unsigned integer | not null | 月給(円)。表示のみ、絞り込みには使わない |
 | selection_steps | jsonb | not null | 選考フロー。ステップ名の配列(例: `["カジュアル面談", "一次面接", "最終面接", "内定"]`)。1〜6ステップ |
 | status | string(enum) | not null, default `draft` | `draft`(下書き) / `published`(公開中) / `closed`(募集終了) |
 | published_at | timestamp | nullable | 初回公開日時。`published_at`から30日以内なら求人一覧で「NEW」を表示する(専用カラムは持たず都度判定) |
 | created_at / updated_at | timestamp | | |
 
 - **給与は月給で統一する**。年収表記は賞与・残業代込みの額で高く見せられてしまうため。フォームでは万円単位で入力し、保存時に円へ変換する
+- **月給は範囲ではなく1つの金額で持つ**(当初は下限・上限の2カラムだったが変更)。「35万〜55万円」のような範囲だと上限に期待して応募しがちで、実際は下限の金額になることが多いため、企業に明確な金額を決めてもらう方が求職者に分かりやすい
+- 受け付ける範囲は10万〜200万円(万円→円の変換漏れや桁の打ち間違いを弾くため)
 - **同時に公開できる求人は1社10件まで**(`status = published`の件数をアプリ側で検証。`draft`/`closed`は数えない)。同じような求人の大量掲載で、AND条件の検索結果を独占されるのを防ぐため。求職者のいいね月間上限と対になる、「企業側にも求人を厳選させる」仕組み
 - 選考フローは表示専用で検索・集計に使わないため、別テーブルにせずjsonbで持つ(Laravelでは`array`キャスト)
 - キーワード検索の対象は`title`と`description`

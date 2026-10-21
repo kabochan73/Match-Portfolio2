@@ -69,8 +69,7 @@ function validJobPosting(array $overrides = []): array
         'desired_candidate' => 'Laravelでの開発経験が2年以上ある方',
         'employment_type' => 'full_time',
         'prefecture' => 'remote',
-        'salary_min' => 350000,
-        'salary_max' => 550000,
+        'salary' => 400000,
         'selection_steps' => ['カジュアル面談', '一次面接', '最終面接'],
         'job_category_ids' => [JobCategory::factory()->create()->id],
         'tech_stack_ids' => [],
@@ -115,8 +114,8 @@ describe('store', function () {
             ->assertUnprocessable()
             ->assertJsonValidationErrors([$field => $message]);
     })->with([
-        'max below min' => [fn () => ['salary_min' => 500000, 'salary_max' => 400000], 'salary_max', '月給の上限は、下限以上の金額にしてください。'],
-        'salary too low' => [fn () => ['salary_min' => 90000], 'salary_min', '月給は10万円以上で指定してください。'],
+        'salary too low' => [fn () => ['salary' => 99999], 'salary', '月給は10万円以上で指定してください。'],
+        'salary too high' => [fn () => ['salary' => 2000001], 'salary', '月給は200万円以下で指定してください。'],
         'no category' => [fn () => ['job_category_ids' => []], 'job_category_ids', '職種は必須項目です。'],
         'four categories' => [fn () => ['job_category_ids' => JobCategory::factory()->count(4)->create()->pluck('id')->all()], 'job_category_ids', '職種は3つまで選べます。'],
         'seven steps' => [fn () => ['selection_steps' => array_fill(0, 7, '面接')], 'selection_steps', '選考フローは6ステップまでです。'],
@@ -167,8 +166,7 @@ describe('show', function () {
         Storage::fake();
         $company = Company::factory()->create();
         $jobPosting = JobPosting::factory()->published()->for($company)->create([
-            'salary_min' => 400000,
-            'salary_max' => 600000,
+            'salary' => 450000,
             'selection_steps' => ['カジュアル面談', '最終面接'],
         ]);
         $jobPosting->jobCategories()->attach(JobCategory::factory()->create(['name' => 'バックエンド'])->id);
@@ -180,7 +178,7 @@ describe('show', function () {
             ->getJson("/api/company/job-postings/{$jobPosting->id}")
             ->assertOk()
             ->assertJsonPath('data.status', ['value' => 'published', 'label' => '公開中'])
-            ->assertJsonPath('data.salary_min', 400000)
+            ->assertJsonPath('data.salary', 450000)
             ->assertJsonPath('data.selection_steps', ['カジュアル面談', '最終面接'])
             ->assertJsonPath('data.job_categories.0.name', 'バックエンド')
             ->assertJsonPath('data.tech_stacks.0.name', 'Laravel')

@@ -13,10 +13,10 @@ use Illuminate\Validation\Rule;
  */
 class JobPostingRequest extends FormRequest
 {
-    /** 月給(円)の範囲 */
+    /** 月給(円)として受け付ける範囲。万円→円の変換漏れ(35円等)や桁の打ち間違いを弾く */
     private const SALARY_MIN = 100000;
 
-    private const SALARY_MAX = 5000000;
+    private const SALARY_MAX = 2000000;
 
     /**
      * ログインは認証ミドルウェア、自社の求人かどうかはPolicyで確認するため、ここでは常に許可する
@@ -42,8 +42,7 @@ class JobPostingRequest extends FormRequest
             // 勤務地はリモートも選べる
             'prefecture' => ['required', Rule::enum(Prefecture::class)],
             // 月給は円で受け取る(フォームの万円からの変換はフロントで行う)
-            'salary_min' => ['required', 'integer', 'min:'.self::SALARY_MIN, 'max:'.self::SALARY_MAX],
-            'salary_max' => ['required', 'integer', 'min:'.self::SALARY_MIN, 'max:'.self::SALARY_MAX, 'gte:salary_min'],
+            'salary' => ['required', 'integer', 'min:'.self::SALARY_MIN, 'max:'.self::SALARY_MAX],
             'selection_steps' => ['required', 'array', 'min:1', 'max:6'],
             'selection_steps.*' => ['required', 'string', 'max:30'],
             'job_category_ids' => ['required', 'array', 'min:1', 'max:3'],
@@ -74,11 +73,8 @@ class JobPostingRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'salary_min.min' => '月給は10万円以上で指定してください。',
-            'salary_min.max' => '月給は500万円以下で指定してください。',
-            'salary_max.min' => '月給は10万円以上で指定してください。',
-            'salary_max.max' => '月給は500万円以下で指定してください。',
-            'salary_max.gte' => '月給の上限は、下限以上の金額にしてください。',
+            'salary.min' => '月給は10万円以上で指定してください。',
+            'salary.max' => '月給は200万円以下で指定してください。',
             'selection_steps.min' => '選考フローを1ステップ以上入力してください。',
             'selection_steps.max' => '選考フローは6ステップまでです。',
             'job_category_ids.min' => '職種を1つ以上選んでください。',

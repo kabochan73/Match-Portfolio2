@@ -34,8 +34,7 @@ class JobPostingResource extends JsonResource
                 'label' => $this->prefecture->label(),
             ],
             // 月給(円)。万円での表示はフロントで行う
-            'salary_min' => $this->salary_min,
-            'salary_max' => $this->salary_max,
+            'salary' => $this->salary,
             'selection_steps' => $this->selection_steps,
             'status' => [
                 'value' => $this->status->value,
