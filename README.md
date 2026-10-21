@@ -31,17 +31,23 @@ IT・エンジニア職に特化した求人マッチングサービス。Wanted
 
 ## ローカル環境の起動
 
-必要なもの: Docker Desktop
+必要なもの: Docker Desktop、Node.js 22
+
+バックエンド(Laravel・PostgreSQL)はDockerで、フロントエンド(Next.js)はホストで直接動かす。
+MacのDockerではファイルの変更がNext.jsの開発サーバーに伝わりにくいため(Next.jsの公式ドキュメントの推奨に従う)。
 
 ```sh
-# 1. 環境変数ファイルを用意する
+# 1. バックエンドを起動する(初回はイメージのビルドに数分かかる)
 cp backend/.env.example backend/.env
-
-# 2. 起動する(初回はイメージのビルドに数分かかる)
 docker compose up -d --build
+docker compose exec app php artisan key:generate   # 初回のみ
+docker compose exec app php artisan db:seed         # 初回のみ(職種・技術スタック等のマスタ)
 
-# 3. Laravelのアプリケーションキーを生成する(初回のみ)
-docker compose exec app php artisan key:generate
+# 2. フロントエンドを起動する
+cd frontend
+cp .env.example .env.local
+npm install
+npm run dev
 ```
 
 | サービス | URL |
@@ -50,7 +56,9 @@ docker compose exec app php artisan key:generate
 | API(Laravel) | http://localhost:8000 |
 | PostgreSQL | localhost:5432(ユーザー・パスワードともに`postgres`) |
 
-マイグレーションは`app`コンテナの起動時に自動で実行される。
+- マイグレーションは`app`コンテナの起動時に自動で実行される
+- ブラウザからのAPI呼び出しは、Next.jsの`/api`・`/sanctum`を経由してLaravelへ中継される
+- フロントエンドをDockerで動かして確認したい場合は`docker compose --profile frontend up -d`
 
 ## テスト
 

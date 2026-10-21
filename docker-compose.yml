@@ -17,8 +17,11 @@ services:
       db:
         condition: service_healthy
 
-  # Next.js(開発サーバー)
+  # Next.js(開発サーバー)。MacのDockerではファイルの変更が開発サーバーに伝わりにくいため、
+  # 普段の開発はホストで直接`npm run dev`する(Next.jsの公式ドキュメントの推奨)。
+  # このサービスはDocker上での動作確認をしたい時だけ`docker compose --profile frontend up`で起動する
   frontend:
+    profiles: ["frontend"]
     build:
       context: ./frontend
       target: dev
