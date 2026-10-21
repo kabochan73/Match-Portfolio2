@@ -4,6 +4,7 @@ use App\Http\Controllers\Company\AuthController as CompanyAuthController;
 use App\Http\Controllers\Company\AvatarController as CompanyAvatarController;
 use App\Http\Controllers\Company\CompanyImageController;
 use App\Http\Controllers\Company\JobPostingController as CompanyJobPostingController;
+use App\Http\Controllers\Company\JobPostingStatusController;
 use App\Http\Controllers\Company\PasswordResetController as CompanyPasswordResetController;
 use App\Http\Controllers\Company\ProfileController as CompanyProfileController;
 use App\Http\Controllers\Seeker\AuthController as SeekerAuthController;
@@ -58,5 +59,7 @@ Route::prefix('company')->group(function () {
             ->parameters(['images' => 'companyImage']);
 
         Route::apiResource('job-postings', CompanyJobPostingController::class)->only(['index', 'show', 'store', 'update']);
+        Route::post('job-postings/{jobPosting}/publish', [JobPostingStatusController::class, 'publish']);
+        Route::post('job-postings/{jobPosting}/close', [JobPostingStatusController::class, 'close']);
     });
 });
