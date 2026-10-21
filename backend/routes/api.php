@@ -8,6 +8,7 @@ use App\Http\Controllers\Company\JobPostingImageController;
 use App\Http\Controllers\Company\JobPostingStatusController;
 use App\Http\Controllers\Company\PasswordResetController as CompanyPasswordResetController;
 use App\Http\Controllers\Company\ProfileController as CompanyProfileController;
+use App\Http\Controllers\Public\CompanyController as PublicCompanyController;
 use App\Http\Controllers\Public\JobPostingController as PublicJobPostingController;
 use App\Http\Controllers\Public\MasterController;
 use App\Http\Controllers\Seeker\AuthController as SeekerAuthController;
@@ -23,6 +24,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('masters', [MasterController::class, 'index']);
 Route::get('jobs', [PublicJobPostingController::class, 'index']);
 Route::get('jobs/{jobPosting}', [PublicJobPostingController::class, 'show']);
+Route::get('companies/{company}', [PublicCompanyController::class, 'show']);
 
 // 求職者本人の操作(/api/seeker/...)
 Route::prefix('seeker')->group(function () {
