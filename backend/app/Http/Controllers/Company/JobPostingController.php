@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Company;
 use App\Enums\JobPostingStatus;
 use App\Enums\LikeStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Company\JobPostingRequest;
 use App\Http\Resources\JobPostingResource;
 use App\Models\Company;
 use App\Models\JobPosting;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 /**
@@ -58,6 +61,51 @@ class JobPostingController extends Controller
             ->loadCount($this->likeCounts());
 
         return new JobPostingResource($jobPosting);
+    }
+
+    /**
+     * 求人を作成する。状態は必ず下書きで作り、公開は「公開」の操作でのみ行う(公開中件数の上限チェックを1か所に集めるため)
+     */
+    public function store(JobPostingRequest $request): JsonResponse
+    {
+        /** @var Company $company */
+        $company = $request->user('company');
+
+        $jobPosting = DB::transaction(function () use ($request, $company) {
+            $jobPosting = $company->jobPostings()->create([
+                ...$request->jobPostingAttributes(),
+                'status' => JobPostingStatus::Draft,
+            ]);
+            $this->syncTags($jobPosting, $request);
+
+            return $jobPosting;
+        });
+
+        return $this->show($jobPosting)->response()->setStatusCode(201);
+    }
+
+    /**
+     * 求人を編集する(公開中の求人も編集できる)
+     */
+    public function update(JobPostingRequest $request, JobPosting $jobPosting): JobPostingResource
+    {
+        Gate::authorize('update', $jobPosting);
+
+        DB::transaction(function () use ($request, $jobPosting) {
+            $jobPosting->update($request->jobPostingAttributes());
+            $this->syncTags($jobPosting, $request);
+        });
+
+        return $this->show($jobPosting);
+    }
+
+    /**
+     * 職種・技術スタックを、送られたIDの状態にそろえる(外したものは削除、新しいものは追加)
+     */
+    private function syncTags(JobPosting $jobPosting, JobPostingRequest $request): void
+    {
+        $jobPosting->jobCategories()->sync($request->validated('job_category_ids'));
+        $jobPosting->techStacks()->sync($request->validated('tech_stack_ids'));
     }
 
     /**

@@ -14,4 +14,9 @@ class JobPostingPolicy
     {
         return $jobPosting->company_id === $company->id;
     }
+
+    public function update(Company $company, JobPosting $jobPosting): bool
+    {
+        return $jobPosting->company_id === $company->id;
+    }
 }
