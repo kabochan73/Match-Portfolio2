@@ -8,6 +8,7 @@ use App\Http\Controllers\Company\JobPostingImageController;
 use App\Http\Controllers\Company\JobPostingStatusController;
 use App\Http\Controllers\Company\PasswordResetController as CompanyPasswordResetController;
 use App\Http\Controllers\Company\ProfileController as CompanyProfileController;
+use App\Http\Controllers\Public\MasterController;
 use App\Http\Controllers\Seeker\AuthController as SeekerAuthController;
 use App\Http\Controllers\Seeker\AvatarController as SeekerAvatarController;
 use App\Http\Controllers\Seeker\CertificationController as SeekerCertificationController;
@@ -16,6 +17,9 @@ use App\Http\Controllers\Seeker\PasswordResetController as SeekerPasswordResetCo
 use App\Http\Controllers\Seeker\ProfileController as SeekerProfileController;
 use App\Http\Controllers\Seeker\WorkExperienceController as SeekerWorkExperienceController;
 use Illuminate\Support\Facades\Route;
+
+// 公開API(ログイン不要)
+Route::get('masters', [MasterController::class, 'index']);
 
 // 求職者本人の操作(/api/seeker/...)
 Route::prefix('seeker')->group(function () {
