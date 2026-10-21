@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Bookmark;
 use App\Models\Company;
 use App\Models\JobCategory;
 use App\Models\JobPosting;
@@ -158,6 +159,69 @@ describe('update', function () {
             ->assertForbidden();
 
         expect($jobPosting->fresh()->title)->toBe('他社の求人');
+    });
+});
+
+describe('destroy', function () {
+    it('deletes a posting without likes along with its tags, bookmarks, and image files', function () {
+        Storage::fake();
+        $company = Company::factory()->create();
+        $jobPosting = JobPosting::factory()->published()->for($company)->create();
+        $jobPosting->jobCategories()->attach(JobCategory::factory()->create()->id);
+        $image = JobPostingImage::factory()->for($jobPosting)->create(['path' => 'job-posting-images/cover.webp']);
+        Storage::put('job-posting-images/cover.webp', 'image');
+        $bookmark = Bookmark::factory()->for($jobPosting)->create();
+
+        $this->actingAs($company, 'company')
+            ->deleteJson("/api/company/job-postings/{$jobPosting->id}")
+            ->assertNoContent();
+
+        $this->assertModelMissing($jobPosting);
+        $this->assertModelMissing($image);
+        $this->assertModelMissing($bookmark);
+        $this->assertDatabaseMissing('job_posting_job_category', ['job_posting_id' => $jobPosting->id]);
+        Storage::assertMissing('job-posting-images/cover.webp');
+    });
+
+    it('returns 422 without deleting a posting that has likes', function () {
+        $company = Company::factory()->create();
+        $jobPosting = JobPosting::factory()->closed()->for($company)->create();
+        Like::factory()->expired()->for($jobPosting)->create();
+
+        $this->actingAs($company, 'company')
+            ->deleteJson("/api/company/job-postings/{$jobPosting->id}")
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['job_posting' => 'いいねがある求人は削除できません。募集終了にしてください。']);
+
+        $this->assertModelExists($jobPosting);
+    });
+
+    it('returns the same 422 instead of a server error when a like arrives right before deletion', function () {
+        Storage::fake();
+        $company = Company::factory()->create();
+        $jobPosting = JobPosting::factory()->published()->for($company)->create();
+        Storage::put('job-posting-images/cover.webp', 'image');
+        JobPostingImage::factory()->for($jobPosting)->create(['path' => 'job-posting-images/cover.webp']);
+        // いいねの有無を確認した後、実際に削除する直前にいいねが入った状況を再現する
+        JobPosting::deleting(fn (JobPosting $deleting) => Like::factory()->for($deleting)->create());
+
+        $this->actingAs($company, 'company')
+            ->deleteJson("/api/company/job-postings/{$jobPosting->id}")
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['job_posting' => 'いいねがある求人は削除できません。募集終了にしてください。']);
+
+        $this->assertModelExists($jobPosting);
+        Storage::assertExists('job-posting-images/cover.webp');
+    });
+
+    it('returns 403 without deleting another company\'s posting', function () {
+        $jobPosting = JobPosting::factory()->create();
+
+        $this->actingAs(Company::factory()->create(), 'company')
+            ->deleteJson("/api/company/job-postings/{$jobPosting->id}")
+            ->assertForbidden();
+
+        $this->assertModelExists($jobPosting);
     });
 });
 

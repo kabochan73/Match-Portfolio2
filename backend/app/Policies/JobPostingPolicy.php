@@ -19,4 +19,9 @@ class JobPostingPolicy
     {
         return $jobPosting->company_id === $company->id;
     }
+
+    public function delete(Company $company, JobPosting $jobPosting): bool
+    {
+        return $jobPosting->company_id === $company->id;
+    }
 }

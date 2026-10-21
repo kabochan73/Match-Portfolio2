@@ -9,18 +9,25 @@ use App\Http\Requests\Company\JobPostingRequest;
 use App\Http\Resources\JobPostingResource;
 use App\Models\Company;
 use App\Models\JobPosting;
+use App\Services\ImageStorage;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 
 /**
  * 企業による自社の求人の管理
  */
 class JobPostingController extends Controller
 {
+    /** PostgreSQLの外部キー制約違反のエラーコード */
+    private const FOREIGN_KEY_VIOLATION = '23503';
+
     /**
      * 自社の求人一覧(すべての状態)。更新日時の新しい順。
      * metaに公開中の件数と上限を含める(求人管理画面の「公開中 3 / 10件」の表示に使う)
@@ -100,12 +107,58 @@ class JobPostingController extends Controller
     }
 
     /**
+     * 求人を削除する。いいねが1件でもある求人は、応募履歴を守るため削除できない(募集終了を案内する)
+     *
+     * @throws ValidationException
+     */
+    public function destroy(JobPosting $jobPosting, ImageStorage $images): Response
+    {
+        Gate::authorize('delete', $jobPosting);
+
+        if ($jobPosting->likes()->exists()) {
+            $this->failToDeleteLikedPosting();
+        }
+
+        // 画像のレコードはDBのcascadeで消えるため、ファイルのパスを先に控えておく
+        $imagePaths = $jobPosting->images()->pluck('path');
+
+        try {
+            // PostgreSQLはトランザクション内でエラーが起きると以降の処理を受け付けなくなるため、
+            // 削除だけをトランザクションで囲み、失敗したらそこまでを巻き戻す
+            DB::transaction(fn () => $jobPosting->delete());
+        } catch (QueryException $e) {
+            // 確認の直後にいいねが入った場合、likes.job_posting_idの外部キー(restrict)が削除を止める。
+            // 500エラーにせず、上と同じ理由を返す(23503: 外部キー制約違反)
+            if ($e->getCode() !== self::FOREIGN_KEY_VIOLATION) {
+                throw $e;
+            }
+
+            $this->failToDeleteLikedPosting();
+        }
+
+        // DBから削除できた後に、ストレージの画像ファイルを消す
+        $imagePaths->each(fn (string $path) => $images->delete($path));
+
+        return response()->noContent();
+    }
+
+    /**
      * 職種・技術スタックを、送られたIDの状態にそろえる(外したものは削除、新しいものは追加)
      */
     private function syncTags(JobPosting $jobPosting, JobPostingRequest $request): void
     {
         $jobPosting->jobCategories()->sync($request->validated('job_category_ids'));
         $jobPosting->techStacks()->sync($request->validated('tech_stack_ids'));
+    }
+
+    /**
+     * @throws ValidationException
+     */
+    private function failToDeleteLikedPosting(): never
+    {
+        throw ValidationException::withMessages([
+            'job_posting' => 'いいねがある求人は削除できません。募集終了にしてください。',
+        ]);
     }
 
     /**

@@ -58,7 +58,7 @@ Route::prefix('company')->group(function () {
             ->only(['store', 'destroy'])
             ->parameters(['images' => 'companyImage']);
 
-        Route::apiResource('job-postings', CompanyJobPostingController::class)->only(['index', 'show', 'store', 'update']);
+        Route::apiResource('job-postings', CompanyJobPostingController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
         Route::post('job-postings/{jobPosting}/publish', [JobPostingStatusController::class, 'publish']);
         Route::post('job-postings/{jobPosting}/close', [JobPostingStatusController::class, 'close']);
     });
