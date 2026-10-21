@@ -19,7 +19,7 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: "Tech Match",
   description:
-    "IT・エンジニア専門の求人マッチングサービス。いいねは月10回、企業は7日以内に必ず返事をくれます。",
+    "IT・エンジニア専門の求人マッチングサービス。いいねは月5回、企業は7日以内に必ず返事をくれます。",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
