@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   // リンクの先読みで、各ページの静的な骨組みを取得する(cacheComponentsとセットで明示する必要がある)
   partialPrefetching: true,
+  images: {
+    // 画像はLaravelがアップロード時に縮小・WebP化しているため、Next.jsでは最適化しない。
+    // (開発中の画像URLはlocalhostで、Next.jsの画像最適化はローカルIPからの取得を既定で拒否する)
+    unoptimized: true,
+  },
   turbopack: {
     rules: {
       "*.css": {
