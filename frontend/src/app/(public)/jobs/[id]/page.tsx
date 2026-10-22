@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Suspense, type ReactNode } from "react";
+import { Suspense } from "react";
 
 import { CompanySection } from "@/components/jobs/CompanySection";
 import { JobConditions } from "@/components/jobs/JobConditions";
-import { JobGallery } from "@/components/jobs/JobGallery";
 import { SelectionSteps } from "@/components/jobs/SelectionSteps";
 import { Badge } from "@/components/ui/Badge";
+import { Gallery } from "@/components/ui/Gallery";
+import { MultilineText, PageSection } from "@/components/ui/PageSection";
 import type { JobPostingDetail } from "@/lib/api/types";
 import { getJob } from "@/lib/jobs/api";
 
@@ -88,45 +89,27 @@ async function JobContent({ id }: { id: string }) {
           </aside>
 
           <div className="flex min-w-0 flex-col gap-10">
-            <JobGallery images={job.images} title={job.title} />
+            <Gallery images={job.images} title={job.title} />
 
-            <Section title="仕事内容">
-              <Paragraphs text={job.description} />
-            </Section>
+            <PageSection title="仕事内容">
+              <MultilineText text={job.description} />
+            </PageSection>
 
-            <Section title="求める人材">
-              <Paragraphs text={job.desired_candidate} />
-            </Section>
+            <PageSection title="求める人材">
+              <MultilineText text={job.desired_candidate} />
+            </PageSection>
 
-            <Section title="選考フロー">
+            <PageSection title="選考フロー">
               <SelectionSteps steps={job.selection_steps} />
-            </Section>
+            </PageSection>
 
-            <Section title="この求人を出している会社">
+            <PageSection title="この求人を出している会社">
               <CompanySection company={job.company} />
-            </Section>
+            </PageSection>
           </div>
         </div>
       </div>
     </>
-  );
-}
-
-function Section({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section>
-      <h2 className="mb-4 border-l-[6px] border-primary pl-3 text-lg font-bold text-primary">
-        {title}
-      </h2>
-      {children}
-    </section>
-  );
-}
-
-/** 企業が入力した文章。改行はそのまま表示する */
-function Paragraphs({ text }: { text: string }) {
-  return (
-    <p className="leading-loose whitespace-pre-wrap text-ink-body">{text}</p>
   );
 }
 

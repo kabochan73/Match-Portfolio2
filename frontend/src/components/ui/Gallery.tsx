@@ -6,17 +6,17 @@ import { useState } from "react";
 import type { Image as GalleryImage } from "@/lib/api/types";
 import { cn } from "@/lib/utils/cn";
 
-type JobGalleryProps = {
+type GalleryProps = {
   images: GalleryImage[];
-  /** 画像の代替テキストに使う(「求人タイトル 1枚目」のように読み上げる) */
+  /** 画像の代替テキストに使う(「求人タイトル 1枚目」「会社名 1枚目」のように読み上げる) */
   title: string;
 };
 
 /**
- * 求人の画像ギャラリー(最大5枚)。サムネイルを押すと大きい画像が切り替わる。
- * 画像がない求人は、求人カードと同じ方眼の枠を出す
+ * 画像ギャラリー(求人票・企業ページ。最大5枚)。サムネイルを押すと大きい画像が切り替わる。
+ * 画像がない場合は、求人カードと同じ方眼の枠を出す
  */
-export function JobGallery({ images, title }: JobGalleryProps) {
+export function Gallery({ images, title }: GalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const selected = images[selectedIndex];
 
