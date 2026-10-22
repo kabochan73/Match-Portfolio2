@@ -35,7 +35,11 @@ export default function JobsPage({ searchParams }: PageProps<"/jobs">) {
       </section>
 
       <div className="mx-auto grid max-w-7xl items-start gap-8 px-4 py-8 sm:px-6 sm:py-10 lg:grid-cols-[280px_1fr]">
-        <aside>
+        {/*
+          PCではスクロールしても画面に残す。サイドバーは画面より縦に長いため、
+          画面の高さに収めて中だけスクロールできるようにする(pr・pbはカードの影が切れないための余白)
+        */}
+        <aside className="lg:sticky lg:top-6 lg:max-h-[calc(100dvh-3rem)] lg:overflow-y-auto lg:pr-2 lg:pb-2">
           <Suspense
             fallback={
               <div className="h-14 border-2 border-primary bg-tint lg:h-150" />
