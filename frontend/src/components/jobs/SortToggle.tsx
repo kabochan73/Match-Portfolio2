@@ -30,7 +30,8 @@ export function SortToggle({ params }: SortToggleProps) {
         return (
           <Link
             key={option.value}
-            href={jobsHref({ ...params, sort: option.value })}
+            // 並び順が変わると何ページ目かの意味も変わるため、1ページ目に戻す
+            href={jobsHref({ ...params, sort: option.value, page: 1 })}
             aria-current={isCurrent ? "page" : undefined}
             // 並び替えてもスクロール位置は保つ
             scroll={false}

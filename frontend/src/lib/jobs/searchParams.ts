@@ -13,6 +13,7 @@ export const JOB_SEARCH_QUERY = {
   employmentType: "type",
   keyword: "q",
   sort: "sort",
+  page: "page",
 } as const;
 
 /** キーワードの最大文字数(LaravelのJobSearchRequestと合わせる) */
@@ -54,6 +55,7 @@ export function parseJobSearchParams(
     ).filter((type) => employmentTypes.has(type)),
     keyword: keyword || undefined,
     sort: first(raw[JOB_SEARCH_QUERY.sort]) === "popular" ? "popular" : "new",
+    page: toIds(raw[JOB_SEARCH_QUERY.page])[0] ?? 1,
   };
 }
 
@@ -82,6 +84,9 @@ export function jobsHref(params: JobSearchParams): string {
   }
   if (params.sort === "popular") {
     query.set(JOB_SEARCH_QUERY.sort, "popular");
+  }
+  if (params.page && params.page > 1) {
+    query.set(JOB_SEARCH_QUERY.page, String(params.page));
   }
 
   const queryString = query.toString();

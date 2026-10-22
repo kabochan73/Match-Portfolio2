@@ -1,11 +1,15 @@
+import Link from "next/link";
 import { Suspense } from "react";
 
 import { JobCard } from "@/components/jobs/JobCard";
 import { SearchSidebar } from "@/components/jobs/SearchSidebar";
 import { SortToggle } from "@/components/jobs/SortToggle";
 import { Badge } from "@/components/ui/Badge";
+import { buttonClass } from "@/components/ui/Button";
+import { Pagination } from "@/components/ui/Pagination";
 import { getMasters, searchJobs } from "@/lib/jobs/api";
 import {
+  jobsHref,
   parseJobSearchParams,
   type RawSearchParams,
 } from "@/lib/jobs/searchParams";
@@ -75,19 +79,52 @@ async function Results({ searchParams }: SearchParamsProps) {
       </div>
 
       {jobs.length > 0 ? (
-        <ul className="grid gap-6 sm:grid-cols-2">
-          {jobs.map((job) => (
-            <li key={job.id}>
-              <JobCard job={job} />
-            </li>
-          ))}
-        </ul>
+        <div className="flex flex-col gap-10">
+          <ul className="grid gap-6 sm:grid-cols-2">
+            {jobs.map((job) => (
+              <li key={job.id}>
+                <JobCard job={job} />
+              </li>
+            ))}
+          </ul>
+          <Pagination
+            currentPage={meta.current_page}
+            lastPage={meta.last_page}
+            getHref={(page) => jobsHref({ ...params, page })}
+          />
+        </div>
+      ) : meta.total > 0 ? (
+        // 最後のページより先の番号が手入力された場合
+        <EmptyResults
+          message="このページに求人はありません。"
+          href={jobsHref({ ...params, page: 1 })}
+          linkLabel="1ページ目に戻る"
+        />
       ) : (
-        <p className="border-2 border-dashed border-line-soft bg-white px-6 py-16 text-center text-sm text-ink-sub">
-          条件に合う求人はありません。
-        </p>
+        <EmptyResults
+          message="条件に合う求人はありません。条件を減らして探してみてください。"
+          href={jobsHref({ sort: params.sort })}
+          linkLabel="条件をクリア"
+        />
       )}
     </>
+  );
+}
+
+type EmptyResultsProps = {
+  message: string;
+  href: string;
+  linkLabel: string;
+};
+
+function EmptyResults({ message, href, linkLabel }: EmptyResultsProps) {
+  return (
+    <div className="flex flex-col items-center gap-5 border-2 border-dashed border-line-soft bg-white px-6 py-16 text-center">
+      <p className="text-sm text-ink-body">{message}</p>
+      <Link href={href} className={buttonClass({ variant: "secondary" })}>
+        {linkLabel}
+      </Link>
+    </div>
   );
 }
 
