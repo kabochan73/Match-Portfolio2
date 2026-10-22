@@ -131,6 +131,7 @@ describe('update', function () {
         'future founded year' => [['founded_year' => 2027], 'founded_year', '設立年は、2026以下の数値である必要があります。'],
         'introduction too long' => [['introduction' => str_repeat('あ', 201)], 'introduction', '紹介文の文字数は、200文字以下である必要があります。'],
         'unknown tech stack' => [['tech_stack_ids' => [999999]], 'tech_stack_ids.0', '選択された技術スタックは、有効ではありません。'],
+        'website not http' => [['website_url' => 'ftp://example.com'], 'website_url', 'WebサイトURLは、有効なURL形式で指定してください。'],
         'missing company name' => [['name' => ''], 'name', '会社名は必須項目です。'],
         'tags not an array' => [['work_style_ids' => 'フルリモート'], 'work_style_ids', '働き方には、配列を指定してください。'],
     ]);

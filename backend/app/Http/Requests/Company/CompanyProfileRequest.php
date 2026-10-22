@@ -38,7 +38,8 @@ class CompanyProfileRequest extends FormRequest
             // 企業の所在地にリモートは選べない(リモートは求人の勤務地のための選択肢)
             'prefecture' => ['nullable', Rule::enum(Prefecture::class)->except(Prefecture::Remote)],
             'address_line' => ['nullable', 'string', 'max:255'],
-            'website_url' => ['nullable', 'string', 'url', 'max:255'],
+            // 求職者が開くリンクのため、ブラウザで開けるhttp・httpsだけを受け付ける
+            'website_url' => ['nullable', 'string', 'url:http,https', 'max:255'],
             // タグは「送られたIDの状態」にそろえるため、選択なしでも空の配列を送ってもらう
             'tech_stack_ids' => ['present', 'array'],
             'tech_stack_ids.*' => ['integer', 'distinct', 'exists:tech_stacks,id'],
