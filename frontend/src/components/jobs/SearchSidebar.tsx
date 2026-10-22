@@ -9,7 +9,11 @@ import { Select } from "@/components/ui/Select";
 import { TextInput } from "@/components/ui/TextInput";
 import type { Masters } from "@/lib/api/types";
 import type { JobSearchParams } from "@/lib/jobs/api";
-import { JOB_SEARCH_QUERY, KEYWORD_MAX_LENGTH } from "@/lib/jobs/searchParams";
+import {
+  JOB_SEARCH_QUERY,
+  jobsHref,
+  KEYWORD_MAX_LENGTH,
+} from "@/lib/jobs/searchParams";
 import { cn } from "@/lib/utils/cn";
 
 type SearchSidebarProps = {
@@ -30,10 +34,7 @@ export function SearchSidebar({ masters, params }: SearchSidebarProps) {
     (params.prefecture ? 1 : 0) +
     (params.keyword ? 1 : 0);
   // 並び順は検索条件ではないため、クリアしても残す
-  const clearHref =
-    params.sort === "popular"
-      ? `/jobs?${JOB_SEARCH_QUERY.sort}=popular`
-      : "/jobs";
+  const clearHref = jobsHref({ sort: params.sort });
 
   return (
     <Card>

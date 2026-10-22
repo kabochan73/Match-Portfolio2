@@ -57,6 +57,38 @@ export function parseJobSearchParams(
   };
 }
 
+/**
+ * 検索条件から求人一覧のURLを作る(並び替えのリンクなど、条件の一部だけを変えたいときに使う)
+ *
+ * @example jobsHref({ ...params, sort: "popular" })
+ */
+export function jobsHref(params: JobSearchParams): string {
+  const query = new URLSearchParams();
+
+  params.jobCategoryIds?.forEach((id) =>
+    query.append(JOB_SEARCH_QUERY.jobCategory, String(id)),
+  );
+  params.techStackIds?.forEach((id) =>
+    query.append(JOB_SEARCH_QUERY.techStack, String(id)),
+  );
+  if (params.prefecture) {
+    query.set(JOB_SEARCH_QUERY.location, params.prefecture);
+  }
+  params.employmentTypes?.forEach((type) =>
+    query.append(JOB_SEARCH_QUERY.employmentType, type),
+  );
+  if (params.keyword) {
+    query.set(JOB_SEARCH_QUERY.keyword, params.keyword);
+  }
+  if (params.sort === "popular") {
+    query.set(JOB_SEARCH_QUERY.sort, "popular");
+  }
+
+  const queryString = query.toString();
+
+  return queryString ? `/jobs?${queryString}` : "/jobs";
+}
+
 function toArray(value: string | string[] | undefined): string[] {
   if (value === undefined) {
     return [];
