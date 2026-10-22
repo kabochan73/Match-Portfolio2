@@ -175,7 +175,7 @@
 | Frontendフォーム | react-hook-form + Zod |
 | Frontendスタイリング | Tailwind CSS v4(UIコンポーネントキット・UIライブラリは導入せず自作)。クラス名の組み立てに`clsx` + `tailwind-merge`。モーダルはブラウザ標準の`<dialog>`を使う |
 | Frontendアイコン | lucide-react |
-| FrontendのURL状態管理 | nuqs(検索条件・並び替え・タブをURLのクエリと同期) |
+| FrontendのURL状態管理 | ライブラリは使わない。検索条件はNext.jsの`<Form>`(GET送信)でURLのクエリにし、並び替え・タブは`<Link>`で切り替える |
 | Frontendフォント | `next/font`でGoogle Fontsを読み込む(Zen Kaku Gothic New / Space Grotesk) |
 | Frontendフォーマッタ | Prettier(ESLintはリントルールのみ) |
 | Frontendテスト | Vitest + Testing Library |
