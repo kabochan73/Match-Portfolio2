@@ -119,6 +119,7 @@ describe('store', function () {
         'salary too high' => [fn () => ['salary' => 2000001], 'salary', '月給は200万円以下で指定してください。'],
         'no category' => [fn () => ['job_category_ids' => []], 'job_category_ids', '職種は必須項目です。'],
         'four categories' => [fn () => ['job_category_ids' => JobCategory::factory()->count(4)->create()->pluck('id')->all()], 'job_category_ids', '職種は3つまで選べます。'],
+        'six tech stacks' => [fn () => ['tech_stack_ids' => TechStack::factory()->count(6)->create()->pluck('id')->all()], 'tech_stack_ids', '技術スタックは5つまで選べます。'],
         'seven steps' => [fn () => ['selection_steps' => array_fill(0, 7, '面接')], 'selection_steps', '選考フローは6ステップまでです。'],
         'empty step name' => [fn () => ['selection_steps' => ['カジュアル面談', '']], 'selection_steps.1', '選考ステップは必須項目です。'],
         'unknown location' => [fn () => ['prefecture' => 'atlantis'], 'prefecture', '選択された勤務地は無効です。'],

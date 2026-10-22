@@ -224,7 +224,7 @@
 | tech_stack_id | bigint FK → tech_stacks.id | not null, restrict delete | |
 
 - 主キー: `(job_posting_id, tech_stack_id)`
-- 選択数の上限なし
+- 1求人につき5件まで(アプリ側のバリデーションで制御)
 
 ### likes(いいね = 応募)
 求職者が求人に「いいね」した時点でレコードが作成される。いいね自体が応募の意思表示であり、別途`applications`テーブルは持たない。

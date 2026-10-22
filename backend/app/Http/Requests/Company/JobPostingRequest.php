@@ -48,7 +48,8 @@ class JobPostingRequest extends FormRequest
             'job_category_ids' => ['required', 'array', 'min:1', 'max:3'],
             'job_category_ids.*' => ['integer', 'distinct', 'exists:job_categories,id'],
             // 技術スタックは任意だが、「送られたIDの状態」にそろえるため、選択なしでも空の配列を送ってもらう
-            'tech_stack_ids' => ['present', 'array'],
+            // 検索に多く出るための付けすぎを防ぐため、5つまでにする
+            'tech_stack_ids' => ['present', 'array', 'max:5'],
             'tech_stack_ids.*' => ['integer', 'distinct', 'exists:tech_stacks,id'],
         ];
     }
@@ -79,6 +80,7 @@ class JobPostingRequest extends FormRequest
             'selection_steps.max' => '選考フローは6ステップまでです。',
             'job_category_ids.min' => '職種を1つ以上選んでください。',
             'job_category_ids.max' => '職種は3つまで選べます。',
+            'tech_stack_ids.max' => '技術スタックは5つまで選べます。',
         ];
     }
 
