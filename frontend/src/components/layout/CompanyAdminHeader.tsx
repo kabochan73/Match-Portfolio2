@@ -1,7 +1,9 @@
+import { Suspense } from "react";
+
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 
-import { AdminNavLink } from "./AdminNavLink";
+import { AdminNavLink, StaticAdminNavLink } from "./AdminNavLink";
 import { Logo } from "./Logo";
 
 // 管理画面のナビ。追加・並べ替えはこの配列だけで行う
@@ -29,9 +31,24 @@ export function CompanyAdminHeader() {
           aria-label="管理画面"
           className="order-last flex w-full gap-6 overflow-x-auto md:order-none md:w-auto md:flex-1"
         >
-          {navLinks.map((link) => (
-            <AdminNavLink key={link.href} href={link.href} label={link.label} />
-          ))}
+          {/* 今いるページの下線はURLを読んで決めるため、読むまでは下線なしのリンクを出す */}
+          <Suspense
+            fallback={navLinks.map((link) => (
+              <StaticAdminNavLink
+                key={link.href}
+                href={link.href}
+                label={link.label}
+              />
+            ))}
+          >
+            {navLinks.map((link) => (
+              <AdminNavLink
+                key={link.href}
+                href={link.href}
+                label={link.label}
+              />
+            ))}
+          </Suspense>
         </nav>
         <div className="flex items-center gap-3">
           <NotificationBell role="company" href="/company/notifications" />
