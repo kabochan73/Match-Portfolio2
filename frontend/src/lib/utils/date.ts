@@ -37,3 +37,12 @@ export function daysUntil(iso: string, now: Date = new Date()): number {
     Math.ceil((new Date(iso).getTime() - now.getTime()) / DAY_MS),
   );
 }
+
+/**
+ * 年月(YYYY-MM)を「2020年4月」と表示する(職歴の在籍期間など)
+ */
+export function formatYearMonth(yearMonth: string): string {
+  const [year, month] = yearMonth.split("-");
+
+  return `${year}年${Number(month)}月`;
+}
