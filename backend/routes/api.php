@@ -10,6 +10,7 @@ use App\Http\Controllers\Company\LikeController as CompanyLikeController;
 use App\Http\Controllers\Company\LikeResponseController;
 use App\Http\Controllers\Company\PasswordResetController as CompanyPasswordResetController;
 use App\Http\Controllers\Company\ProfileController as CompanyProfileController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Public\CompanyController as PublicCompanyController;
 use App\Http\Controllers\Public\JobPostingController as PublicJobPostingController;
 use App\Http\Controllers\Public\MasterController;
@@ -54,6 +55,10 @@ Route::prefix('seeker')->group(function () {
         Route::get('likes/{like}', [SeekerLikeController::class, 'show']);
         Route::post('job-postings/{jobPosting}/likes', [SeekerLikeController::class, 'store']);
         Route::get('like-quota', [LikeQuotaController::class, 'show']);
+
+        Route::get('notifications', [NotificationController::class, 'index']);
+        Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount']);
+        Route::post('notifications/{id}/read', [NotificationController::class, 'markAsRead'])->whereUuid('id');
     });
 });
 
@@ -82,6 +87,10 @@ Route::prefix('company')->group(function () {
         Route::get('likes/{like}', [CompanyLikeController::class, 'show']);
         Route::post('likes/{like}/match', [LikeResponseController::class, 'match']);
         Route::post('likes/{like}/decline', [LikeResponseController::class, 'decline']);
+
+        Route::get('notifications', [NotificationController::class, 'index']);
+        Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount']);
+        Route::post('notifications/{id}/read', [NotificationController::class, 'markAsRead'])->whereUuid('id');
 
         Route::post('job-postings/{jobPosting}/publish', [JobPostingStatusController::class, 'publish']);
         Route::post('job-postings/{jobPosting}/close', [JobPostingStatusController::class, 'close']);
