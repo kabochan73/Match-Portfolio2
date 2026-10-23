@@ -42,6 +42,8 @@ export function TagCheckbox({ label, className, ...props }: CheckboxProps) {
         "inline-flex cursor-pointer items-center border-2 border-primary bg-white px-2.5 py-1 font-display text-xs font-medium text-primary transition",
         "hover:bg-tint has-checked:bg-primary has-checked:text-white",
         "has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-primary",
+        // 選べる数の上限に達したときなど、押せない状態
+        "has-disabled:cursor-not-allowed has-disabled:opacity-40 has-disabled:hover:bg-white",
         className,
       )}
     >
