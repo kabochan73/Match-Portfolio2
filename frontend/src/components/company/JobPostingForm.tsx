@@ -4,17 +4,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { ComponentProps, ReactNode } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 
 import { Button, buttonClass } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { describedBy, Field, FieldGroup } from "@/components/ui/Field";
 import { FormAlert } from "@/components/ui/FormAlert";
 import { FormField } from "@/components/ui/FormField";
+import { FormSection } from "@/components/ui/FormSection";
 import { Select } from "@/components/ui/Select";
 import { TagPicker } from "@/components/ui/TagPicker";
-import { TextArea } from "@/components/ui/TextArea";
+import { TextAreaField } from "@/components/ui/TextAreaField";
 import { apiClientFetch } from "@/lib/api/client";
 import type { CompanyJobPosting, Wrapped } from "@/lib/api/types";
 import {
@@ -112,7 +111,7 @@ export function JobPostingForm({ jobPosting }: JobPostingFormProps) {
     >
       <FormAlert message={errors.root?.message} />
 
-      <Section title="基本情報">
+      <FormSection title="基本情報">
         <FormField
           label="求人タイトル"
           placeholder="例: 自社SaaSを開発するバックエンドエンジニア"
@@ -164,9 +163,9 @@ export function JobPostingForm({ jobPosting }: JobPostingFormProps) {
             </FieldGroup>
           )}
         />
-      </Section>
+      </FormSection>
 
-      <Section title="条件">
+      <FormSection title="条件">
         <div className="grid gap-5 sm:grid-cols-3">
           <Field
             label="雇用形態"
@@ -222,9 +221,9 @@ export function JobPostingForm({ jobPosting }: JobPostingFormProps) {
             {...register("salary_man")}
           />
         </div>
-      </Section>
+      </FormSection>
 
-      <Section title="仕事内容・求める人材">
+      <FormSection title="仕事内容・求める人材">
         <TextAreaField
           label="仕事内容"
           id="description"
@@ -241,15 +240,15 @@ export function JobPostingForm({ jobPosting }: JobPostingFormProps) {
           error={errors.desired_candidate?.message}
           {...register("desired_candidate")}
         />
-      </Section>
+      </FormSection>
 
-      <Section title="選考フロー">
+      <FormSection title="選考フロー">
         <SelectionStepsInput
           control={control}
           register={register}
           errors={errors}
         />
-      </Section>
+      </FormSection>
 
       <div className="flex flex-wrap items-center gap-4">
         <Button type="submit" size="lg" withShadow disabled={save.isPending}>
@@ -274,68 +273,11 @@ export function JobPostingForm({ jobPosting }: JobPostingFormProps) {
   );
 }
 
-function Section({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <Card>
-      <h2 className="border-b-2 border-primary bg-tint px-5 py-3 font-bold text-primary">
-        {title}
-      </h2>
-      <div className="flex flex-col gap-6 px-5 py-5">{children}</div>
-    </Card>
-  );
-}
-
 /** 選んだ数と上限(「2 / 3」) */
 function Count({ value, max }: { value: number; max: number }) {
   return (
     <span className="font-display text-xs text-ink-sub">
       {value} / {max}
     </span>
-  );
-}
-
-type TextAreaFieldProps = ComponentProps<"textarea"> & {
-  label: string;
-  id: string;
-  /** 文字数の上限 */
-  limit: number;
-  length: number;
-  error?: string;
-};
-
-/** 文字数の上限を「120 / 5000」のように出す複数行の入力欄 */
-function TextAreaField({
-  label,
-  id,
-  limit,
-  length,
-  error,
-  ...props
-}: TextAreaFieldProps) {
-  return (
-    <Field
-      label={label}
-      htmlFor={id}
-      error={error}
-      aside={
-        <span
-          className={
-            length > limit
-              ? "font-display text-xs font-bold text-accent"
-              : "font-display text-xs text-ink-sub"
-          }
-        >
-          {length.toLocaleString()} / {limit.toLocaleString()}
-        </span>
-      }
-    >
-      <TextArea
-        id={id}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={describedBy(id, error)}
-        className={error ? "border-accent" : undefined}
-        {...props}
-      />
-    </Field>
   );
 }
