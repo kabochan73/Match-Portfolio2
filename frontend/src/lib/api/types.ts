@@ -218,6 +218,28 @@ export type ReceivedLikeList = Paginated<ReceivedLike> & {
   meta: { counts: Record<LikeTab, number> };
 };
 
+/** 求人に対する自分の状況(GET /api/seeker/job-postings/{id}/my-status) */
+export type JobMyStatus = {
+  bookmarked: boolean;
+  /** 最新のいいね。いいねしていなければnull */
+  like: { id: number; status: Option } | null;
+};
+
+/** いいねの種類ごとの今月の使用状況 */
+export type LikeQuotaItem = {
+  limit: number;
+  used: number;
+  remaining: number;
+};
+
+/** 今月のいいねの残り回数(GET /api/seeker/like-quota) */
+export type LikeQuota = {
+  standard: LikeQuotaItem;
+  super: LikeQuotaItem;
+  /** 次に回復する日時(日本時間の翌月1日0時) */
+  resets_at: string;
+};
+
 /** アプリ内通知(NotificationResource)。Web標準のNotificationと名前がぶつからないようAppを付ける */
 export type AppNotification = {
   id: string;
