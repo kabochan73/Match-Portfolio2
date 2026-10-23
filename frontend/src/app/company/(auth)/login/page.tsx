@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 
 import { AuthCard } from "@/components/auth/AuthCard";
 import { LoginForm } from "@/components/auth/LoginForm";
+import { PasswordResetNotice } from "@/components/auth/PasswordResetNotice";
 
 export const metadata: Metadata = {
   title: "企業ログイン | Tech Match",
@@ -14,6 +16,12 @@ export default function CompanyLoginPage() {
       title="企業ログイン"
       footer={
         <>
+          <Link
+            href="/company/forgot-password"
+            className="font-bold text-primary underline underline-offset-4"
+          >
+            パスワードを忘れた方
+          </Link>
           <p className="text-ink-body">
             はじめての方は
             <Link
@@ -32,6 +40,9 @@ export default function CompanyLoginPage() {
         </>
       }
     >
+      <Suspense>
+        <PasswordResetNotice />
+      </Suspense>
       {/* 管理画面ができるまでは、ログイン後は企業向けページへ */}
       <LoginForm endpoint="/company/login" defaultRedirect="/for-companies" />
     </AuthCard>
