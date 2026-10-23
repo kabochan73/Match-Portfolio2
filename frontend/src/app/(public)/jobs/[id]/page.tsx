@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { CompanySection } from "@/components/jobs/CompanySection";
+import { JobActions } from "@/components/jobs/JobActions";
 import { JobConditions } from "@/components/jobs/JobConditions";
 import { SelectionSteps } from "@/components/jobs/SelectionSteps";
 import { Badge } from "@/components/ui/Badge";
@@ -85,7 +86,11 @@ async function JobContent({ id }: { id: string }) {
         <div className="mt-8 grid items-start gap-8 lg:grid-cols-[1fr_320px] lg:gap-10">
           {/* スマホでは条件を本文より先に見せる */}
           <aside className="lg:sticky lg:top-6 lg:order-last">
-            <JobConditions job={job} />
+            <div className="flex flex-col gap-5">
+              <JobConditions job={job} />
+              {/* いいね・ブックマークは自分の状況によって変わるため、ブラウザで取得して出す */}
+              <JobActions jobPostingId={job.id} isClosed={isClosed} />
+            </div>
           </aside>
 
           <div className="flex min-w-0 flex-col gap-10">
