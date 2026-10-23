@@ -61,6 +61,26 @@ class JobPosting extends Model
     }
 
     /**
+     * 求人カード(JobPostingSummaryResource)の表示に必要なものをまとめて読み込む。
+     * 一覧で求人ごとの問い合わせ(N+1)を避けるため、求人一覧・応募状況などで共通して使う
+     *
+     * @param  Builder<JobPosting>  $query
+     */
+    #[Scope]
+    protected function withCardData(Builder $query): void
+    {
+        $query
+            ->with([
+                'company:id,name,avatar_path',
+                'jobCategories' => fn ($query) => $query->orderBy('sort_order'),
+                'techStacks' => fn ($query) => $query->orderBy('sort_order'),
+                // カバー画像は1枚目だけでよいため、求人ごとに1件に絞って読み込む
+                'images' => fn ($query) => $query->orderBy('id')->limit(1),
+            ])
+            ->withCount('likes');
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

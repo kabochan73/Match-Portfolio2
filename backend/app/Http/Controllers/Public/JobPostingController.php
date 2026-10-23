@@ -29,15 +29,7 @@ class JobPostingController extends Controller
     {
         $query = JobPosting::query()
             ->published()
-            // 求人カードの表示に必要なものをまとめて読み込み、求人ごとの問い合わせ(N+1)を避ける
-            ->with([
-                'company:id,name,avatar_path',
-                'jobCategories' => fn ($query) => $query->orderBy('sort_order'),
-                'techStacks' => fn ($query) => $query->orderBy('sort_order'),
-                // カバー画像は1枚目だけでよいため、求人ごとに1件に絞って読み込む
-                'images' => fn ($query) => $query->orderBy('id')->limit(1),
-            ])
-            ->withCount('likes');
+            ->withCardData();
 
         // 職種・技術スタックは、選んだものをすべて持つ求人(AND)
         foreach ($request->validated('job_category_ids') ?? [] as $jobCategoryId) {
