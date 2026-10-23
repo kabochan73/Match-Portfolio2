@@ -25,8 +25,7 @@ export default function CompanyRegisterPage() {
         </p>
       }
     >
-      {/* 管理画面ができるまでは、登録後は企業向けページへ */}
-      <CompanyRegisterForm redirectTo="/for-companies" />
+      <CompanyRegisterForm redirectTo="/company/job-postings" />
     </AuthCard>
   );
 }

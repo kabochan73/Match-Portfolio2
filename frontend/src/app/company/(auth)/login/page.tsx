@@ -43,8 +43,10 @@ export default function CompanyLoginPage() {
       <Suspense>
         <PasswordResetNotice />
       </Suspense>
-      {/* 管理画面ができるまでは、ログイン後は企業向けページへ */}
-      <LoginForm endpoint="/company/login" defaultRedirect="/for-companies" />
+      <LoginForm
+        endpoint="/company/login"
+        defaultRedirect="/company/job-postings"
+      />
     </AuthCard>
   );
 }
