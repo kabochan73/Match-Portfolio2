@@ -28,7 +28,11 @@ export async function HeaderAccountMenu() {
       >
         マイページ
       </Link>
-      <LogoutButton endpoint="/seeker/logout" className={buttonWidthClass} />
+      <LogoutButton
+        endpoint="/seeker/logout"
+        redirectTo="/"
+        className={buttonWidthClass}
+      />
     </div>
   );
 }

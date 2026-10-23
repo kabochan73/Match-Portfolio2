@@ -10,7 +10,7 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
   return (
     <div className="px-4 py-12 sm:px-6 sm:py-16">
       <Suspense>
-        <RedirectIfSignedIn />
+        <RedirectIfSignedIn as="seeker" to="/jobs" />
       </Suspense>
       {children}
     </div>
