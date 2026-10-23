@@ -218,6 +218,19 @@ export type ReceivedLikeList = Paginated<ReceivedLike> & {
   meta: { counts: Record<LikeTab, number> };
 };
 
+/** アプリ内通知(NotificationResource)。Web標準のNotificationと名前がぶつからないようAppを付ける */
+export type AppNotification = {
+  id: string;
+  /** matched / declined / expired(求職者向け)、received(企業向け) */
+  kind: string;
+  /** 送った時点で作った文言(そのまま表示する) */
+  message: string;
+  /** 押したときに開く応募 */
+  like_id: number;
+  read_at: string | null;
+  created_at: string;
+};
+
 /** Laravelのページ分割(paginate)の返り値 */
 export type Paginated<T> = {
   data: T[];
