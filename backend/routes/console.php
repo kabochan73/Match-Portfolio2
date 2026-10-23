@@ -1,8 +1,6 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+// 返事の期限を過ぎたいいねを期限切れにする。本番ではschedulerのサービス(php artisan schedule:work)が実行する
+Schedule::command('likes:expire')->hourly()->withoutOverlapping();
