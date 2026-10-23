@@ -1,7 +1,7 @@
 import { Clock } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
-import type { ReceivedLike } from "@/lib/api/types";
+import type { Option } from "@/lib/api/types";
 import { cn } from "@/lib/utils/cn";
 import { daysUntil, formatMonthDay } from "@/lib/utils/date";
 
@@ -9,7 +9,12 @@ import { daysUntil, formatMonthDay } from "@/lib/utils/date";
 const URGENT_DAYS = 1;
 
 type LikeStatusLabelProps = {
-  like: Pick<ReceivedLike, "status" | "response_deadline" | "responded_at">;
+  /** 求職者のいいね・企業が受け取ったいいねの両方で使う */
+  like: {
+    status: Option;
+    response_deadline: string;
+    responded_at: string | null;
+  };
 };
 
 /**

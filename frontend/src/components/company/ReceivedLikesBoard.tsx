@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
+import { LikeStatusLabel } from "@/components/likes/LikeStatusLabel";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { FormAlert } from "@/components/ui/FormAlert";
@@ -17,8 +18,6 @@ import {
   type ReceivedLikesFilter,
 } from "@/lib/company/queries";
 import { UNEXPECTED_ERROR_MESSAGE } from "@/lib/forms/applyServerErrors";
-
-import { LikeStatusLabel } from "./LikeStatusLabel";
 
 const TABS: { value: LikeTab; label: string; empty: string }[] = [
   {

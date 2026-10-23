@@ -5,6 +5,7 @@ import { Check, Copy, Mail } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
+import { LikeStatusLabel } from "@/components/likes/LikeStatusLabel";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -23,7 +24,6 @@ import { errorMessage } from "@/lib/forms/applyServerErrors";
 import { formatDateTime } from "@/lib/utils/date";
 
 import { ApplicantProfile } from "./ApplicantProfile";
-import { LikeStatusLabel } from "./LikeStatusLabel";
 
 type Response = "match" | "decline";
 
