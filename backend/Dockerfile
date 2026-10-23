@@ -29,6 +29,9 @@ RUN apk add --no-cache \
 
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 
+# アップロードの上限など、PHPの標準設定を上書きする
+COPY docker/php.ini /usr/local/etc/php/conf.d/zz-app.ini
+
 WORKDIR /var/www/html
 
 # 本番用に依存関係をインストールし、最適化したオートローダーを生成するステージ
