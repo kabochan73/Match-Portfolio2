@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\LikeStatus;
 use App\Models\Like;
+use App\Notifications\LikeResultNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -57,6 +58,10 @@ class LikeResponder
         });
 
         $like->refresh();
+
+        // 返事が確定してから、求職者に結果を知らせる
+        $like->load(['user', 'jobPosting.company:id,name']);
+        $like->user->notify(new LikeResultNotification($like));
     }
 
     /**

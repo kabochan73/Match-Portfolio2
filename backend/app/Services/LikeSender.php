@@ -8,6 +8,7 @@ use App\Enums\LikeType;
 use App\Models\JobPosting;
 use App\Models\Like;
 use App\Models\User;
+use App\Notifications\LikeReceivedNotification;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -30,7 +31,7 @@ class LikeSender
         }
 
         try {
-            return DB::transaction(function () use ($user, $jobPosting, $likeType, $motivation) {
+            $like = DB::transaction(function () use ($user, $jobPosting, $likeType, $motivation) {
                 // 同じ求職者のいいねを1件ずつ順番に処理し、ほぼ同時に送られても上限を超えないようにする
                 User::query()->whereKey($user->id)->lockForUpdate()->first();
 
@@ -63,6 +64,12 @@ class LikeSender
             // 上のチェックをすり抜けた同時の重複応募は、DBの部分ユニークインデックスで弾かれる
             $this->fail('job_posting', 'この求人にはすでにいいねしています。');
         }
+
+        // いいねの保存が確定してから、企業に新しい応募を知らせる
+        $like->setRelation('user', $user);
+        $jobPosting->company->notify(new LikeReceivedNotification($like));
+
+        return $like;
     }
 
     /**
