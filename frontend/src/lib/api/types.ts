@@ -157,6 +157,67 @@ export type CompanyJobPostingList = {
   };
 };
 
+/** 職歴(WorkExperienceResource) */
+export type WorkExperience = {
+  id: number;
+  company_name: string;
+  /** YYYY-MM */
+  started_on: string;
+  /** YYYY-MM。nullなら在籍中 */
+  ended_on: string | null;
+  employment_type: Option;
+};
+
+/** 学歴(EducationResource) */
+export type Education = {
+  id: number;
+  school_name: string;
+};
+
+/** 資格(CertificationResource) */
+export type Certification = {
+  id: number;
+  name: string;
+};
+
+/** 企業に見せる応募者(ApplicantResource)。生年月日ではなく年齢で、メールアドレスはマッチ後だけ含まれる */
+export type Applicant = {
+  id: number;
+  name: string;
+  age: number;
+  avatar_url: string | null;
+  comment: string | null;
+  portfolio_url: string | null;
+  email?: string;
+  /** 応募者の詳細でのみ含まれる */
+  work_experiences?: WorkExperience[];
+  educations?: Education[];
+  certifications?: Certification[];
+};
+
+/** いいね(応募)のタブ。不成立は見送りと期限切れの両方 */
+export type LikeTab = "applied" | "matched" | "unsuccessful";
+
+/** 企業が受け取ったいいね(ReceivedLikeResource) */
+export type ReceivedLike = {
+  id: number;
+  /** standard(いいね) / super(スーパーいいね) */
+  like_type: Option;
+  /** applied / matched / declined / expired */
+  status: Option;
+  motivation: string;
+  response_deadline: string;
+  responded_at: string | null;
+  created_at: string;
+  job_posting: { id: number; title: string };
+  applicant: Applicant;
+};
+
+/** 応募者一覧(GET /api/company/likes)。タブごとの件数を含む */
+export type ReceivedLikeList = Paginated<ReceivedLike> & {
+  meta: { counts: Record<LikeTab, number> };
+};
+
 /** Laravelのページ分割(paginate)の返り値 */
 export type Paginated<T> = {
   data: T[];
