@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Zen_Kaku_Gothic_New } from "next/font/google";
 import "./globals.css";
 
+import { Providers } from "./providers";
+
 // 本文。日本語の文字はunicode-rangeで分割され、使う文字の分だけ読み込まれる
 const zenKakuGothicNew = Zen_Kaku_Gothic_New({
   variable: "--font-zen-kaku-gothic-new",
@@ -28,7 +30,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="ja"
       className={`${zenKakuGothicNew.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
