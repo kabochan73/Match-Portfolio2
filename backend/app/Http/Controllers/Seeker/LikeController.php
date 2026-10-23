@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Seeker;
 
 use App\Enums\JobPostingStatus;
-use App\Enums\LikeStatus;
 use App\Enums\LikeTab;
 use App\Enums\LikeType;
 use App\Http\Controllers\Controller;
@@ -15,7 +14,6 @@ use App\Services\LikeSender;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
@@ -48,7 +46,7 @@ class LikeController extends Controller
             ->paginate(self::PER_PAGE);
 
         return LikeResource::collection($likes)->additional([
-            'meta' => ['counts' => $this->countByTab($user)],
+            'meta' => ['counts' => LikeTab::counts($user->likes())],
         ]);
     }
 
@@ -87,29 +85,5 @@ class LikeController extends Controller
         );
 
         return (new LikeResource($like))->response()->setStatusCode(201);
-    }
-
-    /**
-     * タブごとの件数
-     *
-     * @return array<string, int>
-     */
-    private function countByTab(User $user): array
-    {
-        /** @var Collection<string, int> $countByStatus */
-        $countByStatus = $user->likes()
-            ->toBase()
-            ->selectRaw('status, count(*) as aggregate')
-            ->groupBy('status')
-            ->pluck('aggregate', 'status');
-
-        $counts = [];
-
-        foreach (LikeTab::cases() as $tab) {
-            $counts[$tab->value] = collect($tab->statuses())
-                ->sum(fn (LikeStatus $status) => (int) ($countByStatus[$status->value] ?? 0));
-        }
-
-        return $counts;
     }
 }

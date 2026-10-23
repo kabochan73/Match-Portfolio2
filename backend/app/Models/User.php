@@ -37,6 +37,28 @@ class User extends Authenticatable
     }
 
     /**
+     * 年齢(企業には生年月日ではなく年齢だけを見せる)
+     */
+    public function age(): int
+    {
+        return (int) $this->birth_date->age;
+    }
+
+    /**
+     * プロフィールの職歴・学歴・資格を、画面に並べる順で読み込む(本人のプロフィール・企業が見る応募者詳細で共通)
+     */
+    public function loadProfile(): static
+    {
+        return $this->load([
+            // 職歴は新しい順(在籍開始年月の降順)
+            'workExperiences' => fn ($query) => $query->orderByDesc('started_on')->orderByDesc('id'),
+            // 学歴・資格は登録順
+            'educations' => fn ($query) => $query->orderBy('id'),
+            'certifications' => fn ($query) => $query->orderBy('id'),
+        ]);
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

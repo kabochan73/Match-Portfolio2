@@ -20,16 +20,7 @@ class ProfileController extends Controller
         /** @var User $user */
         $user = $request->user('web');
 
-        // N+1を避けるため、関連データはまとめて読み込む
-        $user->load([
-            // 職歴は新しい順(在籍開始年月の降順)
-            'workExperiences' => fn ($query) => $query->orderByDesc('started_on')->orderByDesc('id'),
-            // 学歴・資格は登録順
-            'educations' => fn ($query) => $query->orderBy('id'),
-            'certifications' => fn ($query) => $query->orderBy('id'),
-        ]);
-
-        return new UserResource($user);
+        return new UserResource($user->loadProfile());
     }
 
     /**
