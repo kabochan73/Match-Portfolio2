@@ -2,9 +2,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { FormAlert } from "@/components/ui/FormAlert";
+import { QueryErrorNotice } from "@/components/ui/QueryErrorNotice";
 import { companyJobPostingQueryOptions } from "@/lib/company/queries";
-import { UNEXPECTED_ERROR_MESSAGE } from "@/lib/forms/applyServerErrors";
 
 import { JobPostingForm } from "./JobPostingForm";
 
@@ -16,6 +15,7 @@ export function EditJobPostingForm({ id }: { id: number }) {
     data: jobPosting,
     isPending,
     isError,
+    error,
   } = useQuery(companyJobPostingQueryOptions(id));
 
   if (isPending) {
@@ -25,7 +25,14 @@ export function EditJobPostingForm({ id }: { id: number }) {
   }
 
   if (isError) {
-    return <FormAlert message={UNEXPECTED_ERROR_MESSAGE} />;
+    return (
+      <QueryErrorNotice
+        error={error}
+        notFoundMessage="この求人は見つかりませんでした。削除されたか、URLが間違っている可能性があります。"
+        backHref="/company/job-postings"
+        backLabel="求人管理へ戻る"
+      />
+    );
   }
 
   return <JobPostingForm jobPosting={jobPosting} />;
