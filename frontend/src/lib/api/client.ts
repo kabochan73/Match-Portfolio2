@@ -4,7 +4,7 @@ type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 
 type ApiClientOptions = {
   method?: HttpMethod;
-  /** JSONにして送る値 */
+  /** JSONにして送る値(FormDataならそのまま送る) */
   body?: unknown;
 };
 
@@ -66,15 +66,22 @@ function send(
   body: unknown,
 ): Promise<Response> {
   const xsrfToken = readCookie(XSRF_COOKIE);
+  // 画像などのファイルはFormDataのまま送る(Content-Typeは区切り文字付きでブラウザが付ける)
+  const isFormData = body instanceof FormData;
 
   return fetch(`/api${path}`, {
     method,
     headers: {
       Accept: "application/json",
-      ...(body !== undefined && { "Content-Type": "application/json" }),
+      ...(body !== undefined &&
+        !isFormData && { "Content-Type": "application/json" }),
       ...(xsrfToken && { "X-XSRF-TOKEN": xsrfToken }),
     },
-    body: body !== undefined ? JSON.stringify(body) : undefined,
+    body: isFormData
+      ? body
+      : body !== undefined
+        ? JSON.stringify(body)
+        : undefined,
   });
 }
 
