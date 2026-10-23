@@ -4,7 +4,9 @@ import { companyFooterLinks, Footer } from "@/components/layout/Footer";
 /**
  * 企業向けページの共通の枠。見る人が企業の採用担当者のため、ヘッダー・フッターを企業向けにする
  */
-export default function ForCompaniesLayout({ children }: LayoutProps<"/">) {
+export default function ForCompaniesLayout({
+  children,
+}: LayoutProps<"/for-companies">) {
   return (
     <>
       <CompanyPublicHeader />

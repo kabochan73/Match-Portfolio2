@@ -20,9 +20,9 @@ src/
 ├── app/
 │   ├── (public)/                  誰でも閲覧できるページ
 │   │   ├── page.tsx               /
-│   │   ├── for-companies/         /for-companies
 │   │   ├── jobs/                  /jobs, /jobs/[id]
 │   │   └── companies/[id]/        /companies/[id]
+│   ├── for-companies/             /for-companies(企業向けのヘッダー・フッターを使うため、(public)の外に置く)
 │   ├── (seeker)/                  求職者(URLにseekerは付かない)
 │   │   ├── (auth)/                login, register, forgot-password, reset-password
 │   │   └── (protected)/           layout.tsxで認証ガード
