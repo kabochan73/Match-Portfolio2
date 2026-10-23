@@ -16,8 +16,10 @@ use App\Http\Controllers\Public\JobPostingController as PublicJobPostingControll
 use App\Http\Controllers\Public\MasterController;
 use App\Http\Controllers\Seeker\AuthController as SeekerAuthController;
 use App\Http\Controllers\Seeker\AvatarController as SeekerAvatarController;
+use App\Http\Controllers\Seeker\BookmarkController;
 use App\Http\Controllers\Seeker\CertificationController as SeekerCertificationController;
 use App\Http\Controllers\Seeker\EducationController as SeekerEducationController;
+use App\Http\Controllers\Seeker\JobPostingMyStatusController;
 use App\Http\Controllers\Seeker\LikeController as SeekerLikeController;
 use App\Http\Controllers\Seeker\LikeQuotaController;
 use App\Http\Controllers\Seeker\PasswordResetController as SeekerPasswordResetController;
@@ -55,6 +57,11 @@ Route::prefix('seeker')->group(function () {
         Route::get('likes/{like}', [SeekerLikeController::class, 'show']);
         Route::post('job-postings/{jobPosting}/likes', [SeekerLikeController::class, 'store']);
         Route::get('like-quota', [LikeQuotaController::class, 'show']);
+
+        Route::get('bookmarks', [BookmarkController::class, 'index']);
+        Route::put('job-postings/{jobPosting}/bookmark', [BookmarkController::class, 'store']);
+        Route::delete('job-postings/{jobPosting}/bookmark', [BookmarkController::class, 'destroy']);
+        Route::get('job-postings/{jobPosting}/my-status', [JobPostingMyStatusController::class, 'show']);
 
         Route::get('notifications', [NotificationController::class, 'index']);
         Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount']);
