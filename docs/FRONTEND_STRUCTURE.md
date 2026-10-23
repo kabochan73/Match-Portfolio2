@@ -21,10 +21,10 @@ src/
 │   ├── (public)/                  誰でも閲覧できるページ
 │   │   ├── page.tsx               /
 │   │   ├── jobs/                  /jobs, /jobs/[id]
-│   │   └── companies/[id]/        /companies/[id]
+│   │   ├── companies/[id]/        /companies/[id]
+│   │   └── (auth)/                求職者のlogin, register, forgot-password, reset-password(公開ページと同じヘッダーを使うため(public)の中に置く)
 │   ├── for-companies/             /for-companies(企業向けのヘッダー・フッターを使うため、(public)の外に置く)
-│   ├── (seeker)/                  求職者(URLにseekerは付かない)
-│   │   ├── (auth)/                login, register, forgot-password, reset-password
+│   ├── (seeker)/                  求職者のログイン後のページ(URLにseekerは付かない)
 │   │   └── (protected)/           layout.tsxで認証ガード
 │   │       └── mypage, mypage/edit, likes, likes/[id], bookmarks, notifications
 │   ├── company/                   企業(URLは/company/...)
