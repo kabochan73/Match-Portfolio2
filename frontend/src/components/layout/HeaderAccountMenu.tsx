@@ -1,7 +1,10 @@
+import { Bookmark, Heart } from "lucide-react";
 import Link from "next/link";
 
 import { LogoutButton } from "@/components/auth/LogoutButton";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { buttonClass } from "@/components/ui/Button";
+import { IconLink } from "@/components/ui/IconLink";
 import { getCurrentSeeker } from "@/lib/seeker/api";
 import { cn } from "@/lib/utils/cn";
 
@@ -19,20 +22,34 @@ export async function HeaderAccountMenu() {
     return <GuestMenu />;
   }
 
-  // いいね・ブックマーク・通知のアイコンは、それぞれの機能を作るときに加える
+  // スマホでは横に入りきらないため、アイコンを1行目、ボタンを2行目に並べる
   return (
-    <div className={menuClass}>
-      <Link
-        href="/mypage"
-        className={cn(buttonClass({ variant: "secondary" }), buttonWidthClass)}
-      >
-        マイページ
-      </Link>
-      <LogoutButton
-        endpoint="/seeker/logout"
-        redirectTo="/"
-        className={buttonWidthClass}
-      />
+    <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto sm:flex-nowrap">
+      <div className="flex items-center gap-3">
+        <IconLink href="/likes" label="応募状況">
+          <Heart className="size-5" aria-hidden />
+        </IconLink>
+        <IconLink href="/bookmarks" label="ブックマーク">
+          <Bookmark className="size-5" aria-hidden />
+        </IconLink>
+        <NotificationBell role="seeker" href="/notifications" />
+      </div>
+      <div className={menuClass}>
+        <Link
+          href="/mypage"
+          className={cn(
+            buttonClass({ variant: "secondary" }),
+            buttonWidthClass,
+          )}
+        >
+          マイページ
+        </Link>
+        <LogoutButton
+          endpoint="/seeker/logout"
+          redirectTo="/"
+          className={buttonWidthClass}
+        />
+      </div>
     </div>
   );
 }
