@@ -4,18 +4,16 @@ import { cn } from "@/lib/utils/cn";
 
 type LogoProps = {
   size?: "md" | "sm";
+  /** falseにするとリンクにしない(企業向けページでは、求職者向けのトップページへ移動させないため) */
+  linked?: boolean;
 };
 
 /**
  * サービスのロゴ(「T」マーク+「Tech Match」)。押すとトップページへ戻る
  */
-export function Logo({ size = "md" }: LogoProps) {
-  return (
-    <Link
-      href="/"
-      className="flex items-center gap-2.5 text-primary"
-      aria-label="Tech Match トップページ"
-    >
+export function Logo({ size = "md", linked = true }: LogoProps) {
+  const content = (
+    <>
       <span
         aria-hidden="true"
         className={cn(
@@ -33,6 +31,17 @@ export function Logo({ size = "md" }: LogoProps) {
       >
         Tech Match
       </span>
+    </>
+  );
+  const className = "flex items-center gap-2.5 text-primary";
+
+  if (!linked) {
+    return <div className={className}>{content}</div>;
+  }
+
+  return (
+    <Link href="/" className={className} aria-label="Tech Match トップページ">
+      {content}
     </Link>
   );
 }
