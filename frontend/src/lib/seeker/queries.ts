@@ -1,7 +1,16 @@
-import { queryOptions } from "@tanstack/react-query";
+import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 
 import { apiClientFetch } from "@/lib/api/client";
-import type { JobMyStatus, LikeQuota, Wrapped } from "@/lib/api/types";
+import type {
+  Bookmark,
+  JobMyStatus,
+  LikeQuota,
+  LikeTab,
+  Paginated,
+  SeekerLike,
+  SeekerLikeList,
+  Wrapped,
+} from "@/lib/api/types";
 
 /**
  * 求職者の画面で使う取得(ブラウザからTanStack Queryで呼ぶ)。
@@ -12,6 +21,10 @@ export const seekerQueryKeys = {
   myStatus: (jobPostingId: number) =>
     ["seeker", "job-postings", jobPostingId, "my-status"] as const,
   likeQuota: ["seeker", "like-quota"] as const,
+  likes: (status: LikeTab, page: number) =>
+    ["seeker", "likes", "list", status, page] as const,
+  like: (id: number) => ["seeker", "likes", id] as const,
+  bookmarks: (page: number) => ["seeker", "bookmarks", page] as const,
 };
 
 /**
@@ -41,5 +54,41 @@ export function likeQuotaQueryOptions() {
 
       return data;
     },
+  });
+}
+
+/** 応募状況(タブ・ページごと)。切り替える間は前の一覧を出したままにする */
+export function seekerLikesQueryOptions(status: LikeTab, page: number) {
+  return queryOptions({
+    queryKey: seekerQueryKeys.likes(status, page),
+    queryFn: () =>
+      apiClientFetch<SeekerLikeList>(
+        `/seeker/likes?status=${status}&page=${page}`,
+      ),
+    placeholderData: keepPreviousData,
+  });
+}
+
+/** 自分のいいね1件(志望動機・応募先の求人) */
+export function seekerLikeQueryOptions(id: number) {
+  return queryOptions({
+    queryKey: seekerQueryKeys.like(id),
+    queryFn: async () => {
+      const { data } = await apiClientFetch<Wrapped<SeekerLike>>(
+        `/seeker/likes/${id}`,
+      );
+
+      return data;
+    },
+  });
+}
+
+/** ブックマーク一覧(ブックマークした新しい順) */
+export function bookmarksQueryOptions(page: number) {
+  return queryOptions({
+    queryKey: seekerQueryKeys.bookmarks(page),
+    queryFn: () =>
+      apiClientFetch<Paginated<Bookmark>>(`/seeker/bookmarks?page=${page}`),
+    placeholderData: keepPreviousData,
   });
 }

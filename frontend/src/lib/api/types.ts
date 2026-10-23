@@ -218,6 +218,36 @@ export type ReceivedLikeList = Paginated<ReceivedLike> & {
   meta: { counts: Record<LikeTab, number> };
 };
 
+/** 求職者本人のいいね(LikeResource) */
+export type SeekerLike = {
+  id: number;
+  /** standard(いいね) / super(スーパーいいね) */
+  like_type: Option;
+  /** applied / matched / declined / expired */
+  status: Option;
+  motivation: string;
+  response_deadline: string;
+  responded_at: string | null;
+  created_at: string;
+  job_posting: JobPostingSummary;
+};
+
+/** 応募状況(GET /api/seeker/likes)。タブごとの件数を含む */
+export type SeekerLikeList = Paginated<SeekerLike> & {
+  meta: { counts: Record<LikeTab, number> };
+};
+
+/** ブックマーク(BookmarkResource) */
+export type Bookmark = {
+  id: number;
+  created_at: string;
+  job_posting: JobPostingSummary;
+  /** 公開中・募集終了(募集終了も一覧に残す) */
+  job_posting_status: Option;
+  /** 最新のいいね(応募状況のバッジ用)。いいねしていなければnull */
+  latest_like: { id: number; status: Option } | null;
+};
+
 /** 求人に対する自分の状況(GET /api/seeker/job-postings/{id}/my-status) */
 export type JobMyStatus = {
   bookmarked: boolean;
