@@ -35,3 +35,15 @@ export function applyServerErrors<T extends FieldValues>(
     }
   }
 }
+
+/**
+ * フォーム以外の操作(公開・削除など)のエラーを、画面に出す1つの文にする。
+ * 入力エラー(422)なら最初のメッセージ、それ以外は通信の失敗の文
+ */
+export function errorMessage(error: unknown): string {
+  if (error instanceof ValidationError) {
+    return Object.values(error.errors)[0]?.[0] ?? error.message;
+  }
+
+  return UNEXPECTED_ERROR_MESSAGE;
+}
