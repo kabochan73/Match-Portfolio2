@@ -12,7 +12,7 @@ export default function NewJobPostingPage() {
       <div>
         <h1 className="text-2xl font-black text-primary">求人を作成</h1>
         <p className="mt-1 text-sm text-ink-body">
-          下書きとして保存されます。内容を確認してから、求人の画面で公開してください。
+          下書きとして保存されます。写真は保存後の編集画面から追加できます。内容を確認してから、求人の画面で公開してください。
         </p>
       </div>
       <JobPostingForm />
