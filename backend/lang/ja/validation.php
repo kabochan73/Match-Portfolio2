@@ -240,5 +240,6 @@ return [
         'job_category_ids.*' => '職種',
         'like_type' => 'いいねの種類',
         'motivation' => '志望動機',
+        'job_posting_id' => '求人',
     ],
 ];

@@ -6,6 +6,8 @@ use App\Http\Controllers\Company\CompanyImageController;
 use App\Http\Controllers\Company\JobPostingController as CompanyJobPostingController;
 use App\Http\Controllers\Company\JobPostingImageController;
 use App\Http\Controllers\Company\JobPostingStatusController;
+use App\Http\Controllers\Company\LikeController as CompanyLikeController;
+use App\Http\Controllers\Company\LikeResponseController;
 use App\Http\Controllers\Company\PasswordResetController as CompanyPasswordResetController;
 use App\Http\Controllers\Company\ProfileController as CompanyProfileController;
 use App\Http\Controllers\Public\CompanyController as PublicCompanyController;
@@ -76,6 +78,11 @@ Route::prefix('company')->group(function () {
             ->parameters(['images' => 'companyImage']);
 
         Route::apiResource('job-postings', CompanyJobPostingController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+        Route::get('likes', [CompanyLikeController::class, 'index']);
+        Route::get('likes/{like}', [CompanyLikeController::class, 'show']);
+        Route::post('likes/{like}/match', [LikeResponseController::class, 'match']);
+        Route::post('likes/{like}/decline', [LikeResponseController::class, 'decline']);
+
         Route::post('job-postings/{jobPosting}/publish', [JobPostingStatusController::class, 'publish']);
         Route::post('job-postings/{jobPosting}/close', [JobPostingStatusController::class, 'close']);
         Route::post('job-postings/{jobPosting}/images', [JobPostingImageController::class, 'store']);
