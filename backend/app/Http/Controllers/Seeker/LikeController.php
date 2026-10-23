@@ -28,8 +28,8 @@ class LikeController extends Controller
 
         $validated = $request->validate([
             'like_type' => ['required', Rule::enum(LikeType::class)],
-            // 志望動機の文字数は制限しない(DB設計どおり)
-            'motivation' => ['required', 'string'],
+            // 企業が読む文章のため、極端に長い文章は受け付けない
+            'motivation' => ['required', 'string', 'max:2000'],
         ]);
 
         /** @var User $user */

@@ -132,6 +132,7 @@ describe('store', function () {
             ->assertJsonValidationErrors([$field => $message]);
     })->with([
         'missing motivation' => [['motivation' => ''], 'motivation', '志望動機は必須項目です。'],
+        'motivation too long' => [['motivation' => str_repeat('あ', 2001)], 'motivation', '志望動機の文字数は、2000文字以下である必要があります。'],
         'unknown like type' => [['like_type' => 'ultra'], 'like_type', '選択されたいいねの種類は無効です。'],
     ]);
 

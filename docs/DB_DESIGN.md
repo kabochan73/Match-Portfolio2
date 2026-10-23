@@ -235,7 +235,7 @@
 | user_id | bigint FK → users.id | not null, cascade delete | |
 | job_posting_id | bigint FK → job_postings.id | not null, **restrict delete** | いいねがある求人の削除をDBレベルでも防ぐ(job_postingsの「削除」参照) |
 | like_type | string(enum) | not null | `standard`(通常のいいね) / `super`(スーパーいいね) |
-| motivation | text | not null | 志望動機(文字数上限なし) |
+| motivation | text | not null | 志望動機(2000字まで。アプリ側のバリデーションで制御) |
 | status | string(enum) | not null, default `applied` | 下記参照 |
 | response_deadline | timestamp | not null | `created_at` + 7日。企業の反応期限(`like_type`によらず共通) |
 | responded_at | timestamp | nullable | 企業がマッチ(気になる)または見送りを返した日時 |
