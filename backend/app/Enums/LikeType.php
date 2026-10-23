@@ -11,6 +11,17 @@ enum LikeType: string
     case Super = 'super';
 
     /**
+     * 1か月に送れる数(月初にリセット。通常とスーパーは別枠)
+     */
+    public function monthlyLimit(): int
+    {
+        return match ($this) {
+            self::Standard => 5,
+            self::Super => 1,
+        };
+    }
+
+    /**
      * 画面に表示する日本語の名称
      */
     public function label(): string
