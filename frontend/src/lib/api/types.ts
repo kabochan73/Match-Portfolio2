@@ -96,6 +96,13 @@ export type PublicCompany = {
   job_postings?: JobPostingSummary[];
 };
 
+/** 求職者本人のプロフィール(GET /api/seeker/profile)。職歴・学歴・資格を含む */
+export type SeekerProfile = Seeker & {
+  work_experiences: WorkExperience[];
+  educations: Education[];
+  certifications: Certification[];
+};
+
 /** ログイン中の企業本人(CompanyResource)。公開用と違い、メールアドレスを含む */
 export type Company = PublicCompany & {
   email: string;

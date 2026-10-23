@@ -46,3 +46,18 @@ export function formatYearMonth(yearMonth: string): string {
 
   return `${year}年${Number(month)}月`;
 }
+
+/**
+ * 生年月日(YYYY-MM-DD)から今の年齢を求める(誕生日の前日までは1つ下)
+ */
+export function ageFromBirthDate(
+  birthDate: string,
+  now: Date = new Date(),
+): number {
+  const [year, month, day] = birthDate.split("-").map(Number);
+  const hadBirthday =
+    now.getMonth() + 1 > month ||
+    (now.getMonth() + 1 === month && now.getDate() >= day);
+
+  return now.getFullYear() - year - (hadBirthday ? 0 : 1);
+}

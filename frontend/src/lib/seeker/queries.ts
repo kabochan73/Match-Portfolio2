@@ -9,6 +9,7 @@ import type {
   Paginated,
   SeekerLike,
   SeekerLikeList,
+  SeekerProfile,
   Wrapped,
 } from "@/lib/api/types";
 
@@ -25,6 +26,7 @@ export const seekerQueryKeys = {
     ["seeker", "likes", "list", status, page] as const,
   like: (id: number) => ["seeker", "likes", id] as const,
   bookmarks: (page: number) => ["seeker", "bookmarks", page] as const,
+  profile: ["seeker", "profile"] as const,
 };
 
 /**
@@ -90,5 +92,19 @@ export function bookmarksQueryOptions(page: number) {
     queryFn: () =>
       apiClientFetch<Paginated<Bookmark>>(`/seeker/bookmarks?page=${page}`),
     placeholderData: keepPreviousData,
+  });
+}
+
+/** 自分のプロフィール(職歴・学歴・資格を含む)。自分の操作でしか変わらないため、更新したときだけ取り直す */
+export function seekerProfileQueryOptions() {
+  return queryOptions({
+    queryKey: seekerQueryKeys.profile,
+    queryFn: async () => {
+      const { data } =
+        await apiClientFetch<Wrapped<SeekerProfile>>("/seeker/profile");
+
+      return data;
+    },
+    staleTime: Infinity,
   });
 }
