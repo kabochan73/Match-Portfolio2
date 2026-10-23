@@ -39,6 +39,18 @@ export type Masters = {
   employment_types: Option[];
 };
 
+/** ログイン中の求職者本人(UserResource)。本人にだけ返すため、メールアドレス・生年月日を含む */
+export type Seeker = {
+  id: number;
+  name: string;
+  email: string;
+  comment: string | null;
+  portfolio_url: string | null;
+  /** YYYY-MM-DD */
+  birth_date: string;
+  avatar_url: string | null;
+};
+
 /** 求人カードに添える会社(CompanySummaryResource) */
 export type CompanySummary = {
   id: number;
