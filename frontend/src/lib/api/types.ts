@@ -123,6 +123,40 @@ export type JobPostingDetail = {
   company: PublicCompany;
 };
 
+/** 企業が管理する自社の求人(JobPostingResource。/api/company/job-postings) */
+export type CompanyJobPosting = {
+  id: number;
+  title: string;
+  description: string;
+  desired_candidate: string;
+  employment_type: Option;
+  prefecture: Option;
+  /** 月給(円) */
+  salary: number;
+  selection_steps: string[];
+  /** draft(下書き) / published(公開中) / closed(募集終了) */
+  status: Option;
+  published_at: string | null;
+  is_new: boolean;
+  updated_at: string;
+  job_categories: JobCategory[];
+  /** 詳細でのみ含まれる */
+  tech_stacks?: TechStack[];
+  images?: Image[];
+  likes_count: number;
+  /** 企業の返事を待っている応募の数 */
+  pending_likes_count: number;
+};
+
+/** 求人管理の一覧(GET /api/company/job-postings) */
+export type CompanyJobPostingList = {
+  data: CompanyJobPosting[];
+  meta: {
+    published_count: number;
+    max_published: number;
+  };
+};
+
 /** Laravelのページ分割(paginate)の返り値 */
 export type Paginated<T> = {
   data: T[];
