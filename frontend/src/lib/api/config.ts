@@ -5,11 +5,23 @@ import "server-only";
  * ブラウザからは同じドメインの/apiをrewritesで中継するため、ブラウザ側では使わない
  */
 export function apiInternalUrl(): string {
-  const url = process.env.API_INTERNAL_URL;
+  return requireEnv("API_INTERNAL_URL");
+}
 
-  if (!url) {
-    throw new Error("環境変数API_INTERNAL_URLが設定されていません");
+/**
+ * このサイト(Next.js)自身のURL。サーバーからLaravelを呼ぶときのOriginヘッダーに使う
+ * (LaravelのSANCTUM_STATEFUL_DOMAINSに含まれている必要がある)
+ */
+export function siteUrl(): string {
+  return requireEnv("SITE_URL");
+}
+
+function requireEnv(name: string): string {
+  const value = process.env[name];
+
+  if (!value) {
+    throw new Error(`環境変数${name}が設定されていません`);
   }
 
-  return url;
+  return value;
 }

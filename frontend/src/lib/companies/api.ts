@@ -2,7 +2,8 @@ import "server-only";
 
 import { cacheLife, cacheTag } from "next/cache";
 
-import { ApiError, apiPublicFetch } from "@/lib/api/server";
+import { ApiError } from "@/lib/api/errors";
+import { apiPublicFetch } from "@/lib/api/server";
 import type { PublicCompany, Wrapped } from "@/lib/api/types";
 
 /** 求人一覧・求人詳細とそろえ、編集・求人の公開・いいね数の反映を最大5分遅らせる */

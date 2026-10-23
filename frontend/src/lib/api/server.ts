@@ -1,19 +1,9 @@
 import "server-only";
 
-import { apiInternalUrl } from "./config";
+import { cookies } from "next/headers";
 
-/**
- * APIがエラー(2xx以外)を返したときの例外。画面側でステータスを見て出し分ける(404ならnotFound()等)
- */
-export class ApiError extends Error {
-  constructor(
-    public readonly status: number,
-    message: string,
-  ) {
-    super(message);
-    this.name = "ApiError";
-  }
-}
+import { apiInternalUrl, siteUrl } from "./config";
+import { ApiError } from "./errors";
 
 /**
  * 公開ページ用のAPI呼び出し(Server Componentから使う)。
@@ -22,9 +12,33 @@ export class ApiError extends Error {
  * @param path "/jobs"のような/api以降のパス
  */
 export async function apiPublicFetch<T>(path: string): Promise<T> {
-  const response = await fetch(`${apiInternalUrl()}/api${path}`, {
-    headers: { Accept: "application/json" },
+  return request<T>(path, { Accept: "application/json" });
+}
+
+/**
+ * ログイン中の人として呼ぶAPI(Server Componentから使う)。ブラウザから届いたCookieをLaravelへ転送する。
+ * Cookieを読むため'use cache'の中では使えず、呼び出す部分は<Suspense>で囲む
+ *
+ * @param path "/seeker/me"のような/api以降のパス
+ * @throws ApiError 未ログインなら401
+ */
+export async function apiAuthFetch<T>(path: string): Promise<T> {
+  const cookieStore = await cookies();
+
+  return request<T>(path, {
+    Accept: "application/json",
+    Cookie: cookieStore.toString(),
+    // LaravelのSanctumは、Originが許可したドメインのときだけCookieのセッションでログイン中と判定する。
+    // ブラウザと違ってサーバーからのfetchにはOriginが付かないため、明示しないと常に401になる
+    Origin: siteUrl(),
   });
+}
+
+async function request<T>(
+  path: string,
+  headers: Record<string, string>,
+): Promise<T> {
+  const response = await fetch(`${apiInternalUrl()}/api${path}`, { headers });
 
   if (!response.ok) {
     throw new ApiError(

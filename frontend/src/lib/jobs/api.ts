@@ -2,7 +2,8 @@ import "server-only";
 
 import { cacheLife, cacheTag } from "next/cache";
 
-import { ApiError, apiPublicFetch } from "@/lib/api/server";
+import { ApiError } from "@/lib/api/errors";
+import { apiPublicFetch } from "@/lib/api/server";
 import type {
   JobPostingDetail,
   JobPostingSummary,
