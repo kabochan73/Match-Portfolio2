@@ -48,6 +48,8 @@ Route::prefix('seeker')->group(function () {
         Route::apiResource('educations', SeekerEducationController::class)->only(['store', 'update', 'destroy']);
         Route::apiResource('certifications', SeekerCertificationController::class)->only(['store', 'update', 'destroy']);
 
+        Route::get('likes', [SeekerLikeController::class, 'index']);
+        Route::get('likes/{like}', [SeekerLikeController::class, 'show']);
         Route::post('job-postings/{jobPosting}/likes', [SeekerLikeController::class, 'store']);
         Route::get('like-quota', [LikeQuotaController::class, 'show']);
     });

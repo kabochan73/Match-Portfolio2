@@ -6,6 +6,7 @@ use App\Models\Company;
 use App\Models\JobPosting;
 use App\Models\Like;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 /**
  * いいねのリクエスト本文(テストごとに一部だけ上書きする)
@@ -171,5 +172,102 @@ describe('quota', function () {
 
     it('returns 401 when not logged in', function () {
         $this->getJson('/api/seeker/like-quota')->assertUnauthorized();
+    });
+});
+
+describe('index', function () {
+    it('lists likes for the selected tab with counts for every tab', function () {
+        $user = User::factory()->create();
+        $company = Company::factory()->create(['name' => '株式会社テスト']);
+        $older = Like::factory()->for($user)->for(JobPosting::factory()->published()->for($company))->create(['created_at' => now()->subDays(2)]);
+        $newer = Like::factory()->for($user)->create(['created_at' => now()->subDay()]);
+        Like::factory()->matched()->for($user)->create();
+        Like::factory()->declined()->for($user)->create();
+        Like::factory()->expired()->for($user)->create();
+        // 他の求職者のいいねは含めない
+        Like::factory()->create();
+
+        $this->actingAs($user, 'web')
+            ->getJson('/api/seeker/likes')
+            ->assertOk()
+            ->assertJsonCount(2, 'data')
+            // 新しい順
+            ->assertJsonPath('data.0.id', $newer->id)
+            ->assertJsonPath('data.1.id', $older->id)
+            // 求人カードの情報も含める
+            ->assertJsonPath('data.1.job_posting.company.name', '株式会社テスト')
+            ->assertJsonPath('meta.counts', ['applied' => 2, 'matched' => 1, 'unsuccessful' => 2])
+            // タブの件数を足しても、ページ分割の情報は残る
+            ->assertJsonPath('meta.current_page', 1)
+            ->assertJsonPath('meta.total', 2);
+    });
+
+    it('shows declined and expired likes together in the unsuccessful tab', function () {
+        $user = User::factory()->create();
+        Like::factory()->declined()->for($user)->create();
+        Like::factory()->expired()->for($user)->create();
+        Like::factory()->for($user)->create();
+
+        $this->actingAs($user, 'web')
+            ->getJson('/api/seeker/likes?status=unsuccessful')
+            ->assertOk()
+            ->assertJsonCount(2, 'data')
+            ->assertJsonPath('data.*.status.label', fn (array $labels) => collect($labels)->sort()->values()->all() === ['期限切れ', '見送り']);
+    });
+
+    it('returns 422 for an unknown tab', function () {
+        $this->actingAs(User::factory()->create(), 'web')
+            ->getJson('/api/seeker/likes?status=declined')
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('status');
+    });
+
+    it('runs the same number of queries regardless of how many likes are returned', function () {
+        $user = User::factory()->create();
+
+        $countQueries = function () use ($user): int {
+            DB::flushQueryLog();
+            DB::enableQueryLog();
+            $this->actingAs($user, 'web')->getJson('/api/seeker/likes')->assertOk();
+            $count = count(DB::getQueryLog());
+            // 有効なままだと後のテストのSQLもすべて記録され続け、メモリを使い果たすため無効に戻す
+            DB::disableQueryLog();
+            DB::flushQueryLog();
+
+            return $count;
+        };
+
+        Like::factory()->for($user)->create();
+        $withOne = $countQueries();
+
+        Like::factory()->count(3)->for($user)->create();
+        $withFour = $countQueries();
+
+        expect($withFour)->toBe($withOne);
+    });
+
+    it('returns 401 when not logged in', function () {
+        $this->getJson('/api/seeker/likes')->assertUnauthorized();
+    });
+});
+
+describe('show', function () {
+    it('shows the seeker\'s own like with its posting', function () {
+        $user = User::factory()->create();
+        $like = Like::factory()->for($user)->create(['motivation' => 'ぜひ一緒に働きたいです。']);
+
+        $this->actingAs($user, 'web')
+            ->getJson("/api/seeker/likes/{$like->id}")
+            ->assertOk()
+            ->assertJsonPath('data.motivation', 'ぜひ一緒に働きたいです。')
+            ->assertJsonPath('data.job_posting.id', $like->job_posting_id);
+    });
+
+    it('returns 403 for another seeker\'s like', function () {
+        $like = Like::factory()->create();
+
+        $this->actingAs(User::factory()->create(), 'web')
+            ->getJson("/api/seeker/likes/{$like->id}")
+            ->assertForbidden();
     });
 });
