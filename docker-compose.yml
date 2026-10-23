@@ -30,6 +30,8 @@ services:
     environment:
       # Next.jsのサーバーからLaravelへのURL(/api・/sanctumの中継と、Server Componentからの取得で使う)
       API_INTERNAL_URL: "http://app:8080"
+      # このサイト自身のURL(サーバーからLaravelを呼ぶときのOriginヘッダー)
+      SITE_URL: "http://localhost:3000"
     volumes:
       - ./frontend:/app
       # ホストのnode_modules・.nextでコンテナ内のもの(Linux用のバイナリを含む)を上書きしないよう、
