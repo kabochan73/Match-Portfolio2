@@ -2,6 +2,7 @@ import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 
 import { apiClientFetch } from "@/lib/api/client";
 import type {
+  Company,
   CompanyJobPosting,
   CompanyJobPostingList,
   LikeTab,
@@ -23,6 +24,7 @@ export type ReceivedLikesFilter = {
  * 一覧と個別のものは同じキーから始め、更新したら両方をまとめて取り直す
  */
 export const companyQueryKeys = {
+  profile: ["company", "profile"] as const,
   jobPostings: ["company", "job-postings"] as const,
   jobPosting: (id: number) => ["company", "job-postings", id] as const,
   likes: ["company", "likes"] as const,
@@ -83,6 +85,19 @@ export function receivedLikeQueryOptions(id: number) {
       const { data } = await apiClientFetch<Wrapped<ReceivedLike>>(
         `/company/likes/${id}`,
       );
+
+      return data;
+    },
+  });
+}
+
+/** 自社の企業ページ(全項目と、技術スタック・働き方・写真) */
+export function companyProfileQueryOptions() {
+  return queryOptions({
+    queryKey: companyQueryKeys.profile,
+    queryFn: async () => {
+      const { data } =
+        await apiClientFetch<Wrapped<Company>>("/company/profile");
 
       return data;
     },
