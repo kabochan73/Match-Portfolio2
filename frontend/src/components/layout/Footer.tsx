@@ -15,6 +15,11 @@ const seekerLinks: FooterLink[] = [
   { href: "/register", label: "会員登録" },
 ];
 
+// 求職者のログイン後のページのフッターのリンク(ログイン・会員登録は出さない)
+export const signedInSeekerFooterLinks: FooterLink[] = seekerLinks.filter(
+  ({ href }) => href !== "/login" && href !== "/register",
+);
+
 // 企業向けページのフッターのリンク
 export const companyFooterLinks: FooterLink[] = [
   { href: "/", label: "求職者の方はこちら" },

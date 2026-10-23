@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 
 import { RequireSignedIn } from "@/components/auth/RequireSignedIn";
-import { Footer } from "@/components/layout/Footer";
+import { Footer, signedInSeekerFooterLinks } from "@/components/layout/Footer";
 import { PublicHeader } from "@/components/layout/PublicHeader";
 
 /**
@@ -17,7 +17,7 @@ export default function SeekerProtectedLayout({ children }: LayoutProps<"/">) {
           <RequireSignedIn as="seeker">{children}</RequireSignedIn>
         </Suspense>
       </main>
-      <Footer />
+      <Footer links={signedInSeekerFooterLinks} />
     </>
   );
 }
