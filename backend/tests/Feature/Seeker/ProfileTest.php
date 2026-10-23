@@ -131,6 +131,21 @@ describe('update', function () {
             ]);
     });
 
+    it('accepts only http and https for the portfolio URL', function () {
+        $user = User::factory()->create();
+
+        $this->actingAs($user, 'web')
+            ->putJson('/api/seeker/profile', [
+                'name' => $user->name,
+                'birth_date' => $user->birth_date->toDateString(),
+                'portfolio_url' => 'ftp://example.com',
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors([
+                'portfolio_url' => 'ポートフォリオURLは、有効なURL形式で指定してください。',
+            ]);
+    });
+
     it('returns 401 when not logged in', function () {
         $this->putJson('/api/seeker/profile', [])->assertUnauthorized();
     });

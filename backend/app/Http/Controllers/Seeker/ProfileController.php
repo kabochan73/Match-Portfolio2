@@ -35,7 +35,8 @@ class ProfileController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'birth_date' => User::birthDateRules(),
             'comment' => ['nullable', 'string', 'max:200'],
-            'portfolio_url' => ['nullable', 'string', 'url', 'max:255'],
+            // 企業が開くリンクのため、ブラウザで開けるhttp・httpsだけを受け付ける
+            'portfolio_url' => ['nullable', 'string', 'url:http,https', 'max:255'],
         ]);
 
         $user->update($validated);
