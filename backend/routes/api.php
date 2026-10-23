@@ -15,6 +15,8 @@ use App\Http\Controllers\Seeker\AuthController as SeekerAuthController;
 use App\Http\Controllers\Seeker\AvatarController as SeekerAvatarController;
 use App\Http\Controllers\Seeker\CertificationController as SeekerCertificationController;
 use App\Http\Controllers\Seeker\EducationController as SeekerEducationController;
+use App\Http\Controllers\Seeker\LikeController as SeekerLikeController;
+use App\Http\Controllers\Seeker\LikeQuotaController;
 use App\Http\Controllers\Seeker\PasswordResetController as SeekerPasswordResetController;
 use App\Http\Controllers\Seeker\ProfileController as SeekerProfileController;
 use App\Http\Controllers\Seeker\WorkExperienceController as SeekerWorkExperienceController;
@@ -45,6 +47,9 @@ Route::prefix('seeker')->group(function () {
         Route::apiResource('work-experiences', SeekerWorkExperienceController::class)->only(['store', 'update', 'destroy']);
         Route::apiResource('educations', SeekerEducationController::class)->only(['store', 'update', 'destroy']);
         Route::apiResource('certifications', SeekerCertificationController::class)->only(['store', 'update', 'destroy']);
+
+        Route::post('job-postings/{jobPosting}/likes', [SeekerLikeController::class, 'store']);
+        Route::get('like-quota', [LikeQuotaController::class, 'show']);
     });
 });
 

@@ -238,5 +238,7 @@ return [
         'selection_steps.*' => '選考ステップ',
         'job_category_ids' => '職種',
         'job_category_ids.*' => '職種',
+        'like_type' => 'いいねの種類',
+        'motivation' => '志望動機',
     ],
 ];
