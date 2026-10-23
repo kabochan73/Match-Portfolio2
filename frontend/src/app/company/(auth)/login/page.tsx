@@ -1,0 +1,39 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+
+import { AuthCard } from "@/components/auth/AuthCard";
+import { LoginForm } from "@/components/auth/LoginForm";
+
+export const metadata: Metadata = {
+  title: "企業ログイン | Tech Match",
+};
+
+export default function CompanyLoginPage() {
+  return (
+    <AuthCard
+      title="企業ログイン"
+      footer={
+        <>
+          <p className="text-ink-body">
+            はじめての方は
+            <Link
+              href="/company/register"
+              className="font-bold text-primary underline underline-offset-4"
+            >
+              無料で掲載をはじめる
+            </Link>
+          </p>
+          <Link
+            href="/login"
+            className="py-2 font-bold text-ink-sub underline underline-offset-4"
+          >
+            求職者の方はこちら
+          </Link>
+        </>
+      }
+    >
+      {/* 管理画面ができるまでは、ログイン後は企業向けページへ */}
+      <LoginForm endpoint="/company/login" defaultRedirect="/for-companies" />
+    </AuthCard>
+  );
+}
