@@ -96,6 +96,11 @@ export type PublicCompany = {
   job_postings?: JobPostingSummary[];
 };
 
+/** ログイン中の企業本人(CompanyResource)。公開用と違い、メールアドレスを含む */
+export type Company = PublicCompany & {
+  email: string;
+};
+
 /** 求人詳細(GET /api/jobs/{id}) */
 export type JobPostingDetail = {
   id: number;
