@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { LikeStatusLabel } from "@/components/likes/LikeStatusLabel";
+import { ApplicantProfile } from "@/components/profile/ApplicantProfile";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -22,8 +23,6 @@ import {
 } from "@/lib/company/queries";
 import { errorMessage } from "@/lib/forms/applyServerErrors";
 import { formatDateTime } from "@/lib/utils/date";
-
-import { ApplicantProfile } from "./ApplicantProfile";
 
 type Response = "match" | "decline";
 
