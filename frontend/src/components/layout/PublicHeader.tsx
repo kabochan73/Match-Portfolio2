@@ -1,13 +1,15 @@
 import Link from "next/link";
+import { Suspense } from "react";
 
-import { buttonClass } from "@/components/ui/Button";
-import { cn } from "@/lib/utils/cn";
-
+import {
+  HeaderAccountMenu,
+  HeaderAccountMenuSkeleton,
+} from "./HeaderAccountMenu";
 import { Logo } from "./Logo";
 
 /**
- * ログインしていない人向けのヘッダー。
- * ログイン中の表示(❤️・🔖・通知・マイページ)は、ログイン機能を作るときに<Suspense>の中で出し分ける
+ * 求職者向けのヘッダー。ロゴと「求人を探す」は静的な骨組みとして配信し、
+ * ログイン状態で変わる右側だけを<Suspense>の中でリクエストごとに描画する
  */
 export function PublicHeader() {
   return (
@@ -19,30 +21,9 @@ export function PublicHeader() {
             求人を探す
           </Link>
         </div>
-        {/* スマホでは2つのボタンを横幅いっぱいに並べる。「企業の方はこちら」はフッターにもあるため隠す */}
-        <div className="flex w-full items-center gap-3 sm:w-auto">
-          <Link
-            href="/for-companies"
-            className="hidden px-1 py-3 text-sm font-bold text-ink-sub underline-offset-4 hover:underline sm:block"
-          >
-            企業の方はこちら
-          </Link>
-          <Link
-            href="/login"
-            className={cn(
-              buttonClass({ variant: "secondary" }),
-              "flex-1 sm:flex-none",
-            )}
-          >
-            ログイン
-          </Link>
-          <Link
-            href="/register"
-            className={cn(buttonClass(), "flex-1 sm:flex-none")}
-          >
-            無料で会員登録
-          </Link>
-        </div>
+        <Suspense fallback={<HeaderAccountMenuSkeleton />}>
+          <HeaderAccountMenu />
+        </Suspense>
       </div>
     </header>
   );
