@@ -35,13 +35,7 @@ export async function HeaderAccountMenu() {
         <NotificationBell role="seeker" href="/notifications" />
       </div>
       <div className={menuClass}>
-        <Link
-          href="/mypage"
-          className={cn(
-            buttonClass({ variant: "secondary" }),
-            buttonWidthClass,
-          )}
-        >
+        <Link href="/mypage" className={cn(buttonClass(), buttonWidthClass)}>
           マイページ
         </Link>
         <LogoutButton

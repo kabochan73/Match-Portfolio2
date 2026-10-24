@@ -11,20 +11,20 @@ type IconLinkProps = {
 };
 
 /**
- * ヘッダーに並べる四角いアイコンのリンク(応募状況・ブックマーク・通知)
+ * ヘッダーに並べるアイコンのリンク(応募状況・ブックマーク・通知)
  */
 export function IconLink({ href, label, children, badge = 0 }: IconLinkProps) {
   return (
     <Link
       href={href}
       aria-label={label}
-      className="relative flex size-11 shrink-0 items-center justify-center border-2 border-primary bg-white text-primary transition hover:bg-tint"
+      className="relative flex size-11 shrink-0 items-center justify-center text-primary transition hover:bg-tint"
     >
       {children}
       {badge > 0 && (
         <span
           aria-hidden
-          className="absolute -top-2 -right-2 flex h-5 min-w-5 items-center justify-center bg-accent px-1 font-display text-[11px] font-bold text-white"
+          className="absolute top-0.5 right-0.5 flex h-5 min-w-5 items-center justify-center bg-accent px-1 font-display text-[11px] font-bold text-white"
         >
           {badge > 9 ? "9+" : badge}
         </span>
