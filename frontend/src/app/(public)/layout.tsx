@@ -1,4 +1,9 @@
-import { Footer } from "@/components/layout/Footer";
+import { Suspense } from "react";
+
+import {
+  PublicFooter,
+  PublicFooterSkeleton,
+} from "@/components/layout/PublicFooter";
 import { PublicHeader } from "@/components/layout/PublicHeader";
 
 /**
@@ -9,7 +14,9 @@ export default function PublicLayout({ children }: LayoutProps<"/">) {
     <>
       <PublicHeader />
       <main className="flex-1">{children}</main>
-      <Footer />
+      <Suspense fallback={<PublicFooterSkeleton />}>
+        <PublicFooter />
+      </Suspense>
     </>
   );
 }
