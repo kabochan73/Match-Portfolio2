@@ -15,16 +15,16 @@ import { cn } from "@/lib/utils/cn";
 
 const FEATURES = [
   {
-    title: "待たされない",
-    body: "企業は7日以内に「気になる」か「見送り」を返します。期限を過ぎれば自動で不成立に。結果が来ないまま待ち続ける、いわゆるサイレントお祈りはありません。",
+    title: "すぐ返答",
+    body: "企業は7日以内に「気になる」か「見送り」を返します。期限を過ぎれば自動で不成立に。結果が来ないまま待ち続ける、サイレントお祈りはありません。",
   },
   {
-    title: "書類いらず",
+    title: "書類不要",
     body: "一度作ったプロフィールが、履歴書と職務経歴書の代わりになります。応募のたびに書くのは、その企業への志望動機だけ。",
   },
   {
-    title: "本気が伝わる",
-    body: "いいねは月5回、特別なスーパーいいねは月1回まで。数が限られているから、ひとつひとつの応募に本気がこもり、企業もしっかり向き合ってくれます。",
+    title: "志望動機で勝負",
+    body: "いいねの際、一緒に志望動機を送れます。限られたいいねと志望動機で、企業に本気度を伝えましょう！",
   },
 ];
 
@@ -39,11 +39,11 @@ const STEPS = [
   },
   {
     title: "志望動機を書いていいね",
-    body: "いいねが応募になります。ここぞという求人には、スーパーいいねを。",
+    body: "いいねが応募になります。ここぞという求人には、スーパーいいね。",
   },
   {
     title: "7日以内に結果が届く",
-    body: "マッチしたら、企業から登録メールアドレスに連絡が届きます。",
+    body: "マッチしたら、企業から登録したメールアドレスに連絡が届きます。",
   },
 ];
 
@@ -67,7 +67,7 @@ export default function HomePage() {
             eyebrow="CONCEPT"
             description="Tech Matchでは、求職者の「いいね」がそのまま応募になります。採用の可能性が低い相手に時間を使わずに済むから、転職活動も採用活動も、もっと効率的に。"
           >
-            いいねを、一次面接に。
+            採用のミスマッチを防ぐ
           </SectionHeading>
           <FeatureCards features={FEATURES} />
           <ul className="flex flex-wrap gap-x-8 gap-y-2 border-2 border-dashed border-line-soft bg-page px-6 py-4.5 text-sm font-bold text-ink-body">
@@ -129,18 +129,16 @@ function Hero() {
     <section className="border-b-2 border-primary bg-tint-strong">
       <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-14 px-4 pt-16 pb-20 sm:px-6 sm:pt-18">
         <div className="flex min-w-0 flex-[1_1_460px] flex-col items-start gap-6">
-          <p className="bg-primary px-3 py-1 text-[13px] font-bold tracking-wider text-white">
+          <p className="bg-primary px-3 py-1 text-[20px] font-bold tracking-wider text-white">
             IT・エンジニア専門の求人マッチング
           </p>
           <h1 className="text-[clamp(2.375rem,5vw,3.875rem)] leading-tight font-black text-primary">
-            いいねは、月5回。
-            <br />
-            だから<span className="text-accent">本気</span>が届く。
+            いいねを一次面接に
           </h1>
           <p className="max-w-130 leading-relaxed font-medium text-ink-body">
-            プロフィールを一度作れば、それが職務経歴書に。
+            プロフィールを一度作れば、それが経歴書に。
             <br />
-            企業は7日以内に必ず返事をくれるから、もう結果を待ち続けることはありません。
+            必ず7日以内に結果がわかるから、待ち続けることも無し
           </p>
           <div className="flex flex-wrap gap-4 pt-2">
             <Link
