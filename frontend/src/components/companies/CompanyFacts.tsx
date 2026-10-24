@@ -14,9 +14,7 @@ type CompanyFactsProps = {
  * PCでは右の列に置き、スクロールしても画面に残す。未入力の項目は行ごと出さない
  */
 export function CompanyFacts({ company }: CompanyFactsProps) {
-  const location = [company.prefecture?.label, company.address_line]
-    .filter(Boolean)
-    .join(" ");
+  const location = companyLocation(company);
 
   return (
     <Card>
@@ -83,7 +81,21 @@ export function CompanyFacts({ company }: CompanyFactsProps) {
   );
 }
 
-function FactRow({ label, children }: { label: string; children: ReactNode }) {
+/** 所在地(都道府県と住所)。どちらも未入力なら空文字 */
+export function companyLocation(company: PublicCompany): string {
+  return [company.prefecture?.label, company.address_line]
+    .filter(Boolean)
+    .join(" ");
+}
+
+/** 会社情報の1行(求人詳細の企業カードでも使う) */
+export function FactRow({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) {
   return (
     <div className="grid grid-cols-[4.5rem_1fr] items-start gap-2">
       <dt className="pt-0.5 text-xs font-bold text-ink-sub">{label}</dt>
