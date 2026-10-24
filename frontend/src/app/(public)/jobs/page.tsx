@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import { JobCard } from "@/components/jobs/JobCard";
 import { SearchSidebar } from "@/components/jobs/SearchSidebar";
 import { SortToggle } from "@/components/jobs/SortToggle";
-import { Badge } from "@/components/ui/Badge";
 import { buttonClass } from "@/components/ui/Button";
 import { Pagination } from "@/components/ui/Pagination";
 import { getMasters, searchJobs } from "@/lib/jobs/api";
@@ -19,20 +18,14 @@ type SearchParamsProps = {
 };
 
 /**
- * 求人一覧。見出しと枠は静的な骨組みとして配信し、
+ * 求人一覧。枠は静的な骨組みとして配信し、
  * URLの検索条件を読むサイドバーと検索結果は<Suspense>の中でリクエストごとに描画する
  */
 export default function JobsPage({ searchParams }: PageProps<"/jobs">) {
   return (
     <>
-      <section className="border-b-2 border-primary bg-tint-strong">
-        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12">
-          <Badge>JOBS</Badge>
-          <h1 className="mt-3 text-3xl font-black text-primary sm:text-4xl">
-            エンジニア求人を探す
-          </h1>
-        </div>
-      </section>
+      {/* 画面には出さないが、何のページかを読み上げ・検索エンジンに伝える */}
+      <h1 className="sr-only">エンジニア求人を探す</h1>
 
       <div className="mx-auto grid max-w-7xl items-start gap-8 px-4 py-8 sm:px-6 sm:py-10 lg:grid-cols-[280px_1fr]">
         {/*
