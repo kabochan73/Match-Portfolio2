@@ -88,8 +88,7 @@ async function JobContent({ id }: { id: string }) {
           <aside className="lg:sticky lg:top-6 lg:order-last">
             <div className="flex flex-col gap-5">
               <JobConditions job={job} />
-              {/* いいね・ブックマークは自分の状況によって変わるため、ブラウザで取得して出す */}
-              <JobActions jobPostingId={job.id} isClosed={isClosed} />
+              <CompanySection company={job.company} />
             </div>
           </aside>
 
@@ -108,8 +107,9 @@ async function JobContent({ id }: { id: string }) {
               <SelectionSteps steps={job.selection_steps} />
             </PageSection>
 
-            <PageSection title="この求人を出している会社">
-              <CompanySection company={job.company} />
+            <PageSection title="この求人に応募する">
+              {/* いいね・ブックマークは自分の状況によって変わるため、ブラウザで取得して出す */}
+              <JobActions jobPostingId={job.id} isClosed={isClosed} />
             </PageSection>
           </div>
         </div>

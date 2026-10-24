@@ -6,7 +6,6 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { Button, buttonClass } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { Dialog } from "@/components/ui/Dialog";
 import { FormSuccess } from "@/components/ui/FormSuccess";
 import { ApiError } from "@/lib/api/errors";
@@ -39,7 +38,7 @@ export function JobActions({ jobPostingId, isClosed }: JobActionsProps) {
 
   if (isPending) {
     return (
-      <div className="h-28 animate-pulse border-2 border-primary/30 bg-white" />
+      <div className="ml-auto h-14 w-80 max-w-full animate-pulse bg-tint" />
     );
   }
 
@@ -52,8 +51,12 @@ export function JobActions({ jobPostingId, isClosed }: JobActionsProps) {
     return null;
   }
 
+  // 期限切れのあとは、もう一度いいねできる
+  const activeLike =
+    status.like && status.like.status.value !== "expired" ? status.like : null;
+
   return (
-    <Card className="flex flex-col gap-3 p-5">
+    <div className="flex flex-col gap-3">
       <FormSuccess
         message={
           liked
@@ -61,15 +64,36 @@ export function JobActions({ jobPostingId, isClosed }: JobActionsProps) {
             : undefined
         }
       />
-      <LikeStatusPanel
-        status={status}
-        isClosed={isClosed}
-        onOpenForm={() => setFormOpen(true)}
-      />
-      <BookmarkButton
-        jobPostingId={jobPostingId}
-        bookmarked={status.bookmarked}
-      />
+      {activeLike ? (
+        <LikeStatus like={activeLike} />
+      ) : isClosed ? (
+        <p className="border-2 border-line-soft bg-page p-4 text-sm text-ink-body">
+          この求人は募集を終了しているため、いいねできません。
+        </p>
+      ) : (
+        status.like && (
+          <p className="text-xs text-ink-sub">
+            前回のいいねは、企業から返事がなく期限切れになりました。もう一度いいねできます。
+          </p>
+        )
+      )}
+      <div className="flex flex-wrap items-center justify-end gap-3">
+        <BookmarkButton
+          jobPostingId={jobPostingId}
+          bookmarked={status.bookmarked}
+        />
+        {!activeLike && !isClosed && (
+          <Button
+            size="lg"
+            variant="accent"
+            withShadow
+            onClick={() => setFormOpen(true)}
+          >
+            <Heart className="size-5" aria-hidden />
+            いいねして応募する
+          </Button>
+        )}
+      </div>
 
       <Dialog
         open={formOpen}
@@ -92,82 +116,39 @@ export function JobActions({ jobPostingId, isClosed }: JobActionsProps) {
           />
         )}
       </Dialog>
-    </Card>
+    </div>
   );
 }
 
-type LikeStatusPanelProps = {
-  status: JobMyStatus;
-  isClosed: boolean;
-  onOpenForm: () => void;
+const LIKE_STATUS_MESSAGES: Record<string, string> = {
+  applied: "いいね済みです。企業からの返事を待っています。",
+  matched: "マッチしました。企業から登録メールアドレスに連絡が届きます。",
+  declined: "今回は見送りとなりました。",
 };
 
-/** いいねのボタン、または応募済みの状況 */
-function LikeStatusPanel({
-  status,
-  isClosed,
-  onOpenForm,
-}: LikeStatusPanelProps) {
-  const like = status.like;
-
-  // 期限切れのあとは、もう一度いいねできる
-  if (like && like.status.value !== "expired") {
-    const messages: Record<string, string> = {
-      applied: "いいね済みです。企業からの返事を待っています。",
-      matched: "マッチしました。企業から登録メールアドレスに連絡が届きます。",
-      declined: "今回は見送りとなりました。",
-    };
-
-    return (
-      <div
-        className={cn(
-          "flex flex-col gap-2 border-2 p-4 text-sm",
-          like.status.value === "matched"
-            ? "border-primary bg-tint text-primary"
-            : "border-line-soft bg-page text-ink-body",
-        )}
-      >
-        <p className="flex items-center gap-2 font-bold">
-          <Heart className="size-4 fill-current text-accent" aria-hidden />
-          {like.status.label}
-        </p>
-        <p>{messages[like.status.value]}</p>
-        <Link
-          href={`/likes/${like.id}`}
-          className="self-start font-bold text-primary underline underline-offset-4"
-        >
-          応募の詳細を見る
-        </Link>
-      </div>
-    );
-  }
-
-  if (isClosed) {
-    return (
-      <p className="border-2 border-line-soft bg-page p-4 text-sm text-ink-body">
-        この求人は募集を終了しているため、いいねできません。
-      </p>
-    );
-  }
-
+/** 応募済み(反応待ち・マッチ・見送り)の状況 */
+function LikeStatus({ like }: { like: NonNullable<JobMyStatus["like"]> }) {
   return (
-    <>
-      {like?.status.value === "expired" && (
-        <p className="text-xs text-ink-sub">
-          前回のいいねは、企業から返事がなく期限切れになりました。もう一度いいねできます。
-        </p>
+    <div
+      className={cn(
+        "flex flex-col gap-2 border-2 p-4 text-sm",
+        like.status.value === "matched"
+          ? "border-primary bg-tint text-primary"
+          : "border-line-soft bg-page text-ink-body",
       )}
-      <Button
-        size="lg"
-        variant="accent"
-        withShadow
-        onClick={onOpenForm}
-        className="w-full"
+    >
+      <p className="flex items-center gap-2 font-bold">
+        <Heart className="size-4 fill-current text-accent" aria-hidden />
+        {like.status.label}
+      </p>
+      <p>{LIKE_STATUS_MESSAGES[like.status.value]}</p>
+      <Link
+        href={`/likes/${like.id}`}
+        className="self-start font-bold text-primary underline underline-offset-4"
       >
-        <Heart className="size-5" aria-hidden />
-        いいねして応募する
-      </Button>
-    </>
+        応募の詳細を見る
+      </Link>
+    </div>
   );
 }
 
@@ -176,33 +157,36 @@ function GuestActions({ jobPostingId, isClosed }: JobActionsProps) {
   const loginHref = `/login?redirect=${encodeURIComponent(`/jobs/${jobPostingId}`)}`;
 
   return (
-    <Card className="flex flex-col gap-3 p-5">
-      {!isClosed && (
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center justify-end gap-3">
         <Link
           href={loginHref}
-          className={cn(
-            buttonClass({ variant: "accent", size: "lg", withShadow: true }),
-            "w-full",
-          )}
+          className={buttonClass({ variant: "secondary", size: "lg" })}
         >
-          <Heart className="size-5" aria-hidden />
-          いいねして応募する
+          <Bookmark className="size-4" aria-hidden />
+          ブックマーク
         </Link>
-      )}
-      <Link
-        href={loginHref}
-        className={cn(buttonClass({ variant: "secondary" }), "w-full")}
-      >
-        <Bookmark className="size-4" aria-hidden />
-        ブックマーク
-      </Link>
-      <p className="text-xs text-ink-sub">
+        {!isClosed && (
+          <Link
+            href={loginHref}
+            className={buttonClass({
+              variant: "accent",
+              size: "lg",
+              withShadow: true,
+            })}
+          >
+            <Heart className="size-5" aria-hidden />
+            いいねして応募する
+          </Link>
+        )}
+      </div>
+      <p className="text-right text-xs text-ink-sub">
         いいね・ブックマークには
         <Link href={loginHref} className="font-bold text-primary underline">
           ログイン
         </Link>
         が必要です。
       </p>
-    </Card>
+    </div>
   );
 }

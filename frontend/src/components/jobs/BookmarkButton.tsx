@@ -49,9 +49,9 @@ export function BookmarkButton({
   return (
     <Button
       variant="secondary"
+      size="lg"
       aria-pressed={bookmarked}
       onClick={() => toggle.mutate(!bookmarked)}
-      className="w-full"
     >
       <Bookmark
         className={cn("size-4", bookmarked && "fill-current")}
