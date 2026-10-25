@@ -28,6 +28,12 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    // Next.js(フロントエンド)への再検証の通知。URLか合言葉が空なら通知しない(テストなど)
+    'frontend' => [
+        'revalidate_url' => env('REVALIDATE_URL'),
+        'revalidate_secret' => env('REVALIDATE_SECRET'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
