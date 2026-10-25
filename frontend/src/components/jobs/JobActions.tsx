@@ -9,7 +9,6 @@ import { Button, buttonClass } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
 import { FormSuccess } from "@/components/ui/FormSuccess";
 import { ApiError } from "@/lib/api/errors";
-import type { JobMyStatus } from "@/lib/api/types";
 import { myStatusQueryOptions, seekerQueryKeys } from "@/lib/seeker/queries";
 import { cn } from "@/lib/utils/cn";
 
@@ -64,24 +63,34 @@ export function JobActions({ jobPostingId, isClosed }: JobActionsProps) {
             : undefined
         }
       />
-      {activeLike ? (
-        <LikeStatus like={activeLike} />
-      ) : isClosed ? (
+      {!activeLike && isClosed && (
         <p className="border-2 border-line-soft bg-page p-4 text-sm text-ink-body">
           この求人は募集を終了しているため、いいねできません。
         </p>
-      ) : (
-        status.like && (
-          <p className="text-xs text-ink-sub">
-            前回のいいねは、企業から返事がなく期限切れになりました。もう一度いいねできます。
-          </p>
-        )
+      )}
+      {!activeLike && !isClosed && status.like && (
+        <p className="text-xs text-ink-sub">
+          前回のいいねは、企業から返事がなく期限切れになりました。もう一度いいねできます。
+        </p>
       )}
       <div className="flex flex-wrap items-center justify-end gap-3">
         <BookmarkButton
           jobPostingId={jobPostingId}
           bookmarked={status.bookmarked}
         />
+        {/* 応募の結果は応募状況と通知で見られるため、ここでは押せない表示に変えるだけ */}
+        {activeLike && (
+          <span
+            className={cn(
+              buttonClass({ variant: "primary", size: "lg" }),
+              // 押せないため、乗せても色を変えない
+              "hover:bg-primary",
+            )}
+          >
+            <Heart className="size-5 fill-current text-accent" aria-hidden />
+            いいね済み
+          </span>
+        )}
         {!activeLike && !isClosed && (
           <Button
             size="lg"
@@ -116,38 +125,6 @@ export function JobActions({ jobPostingId, isClosed }: JobActionsProps) {
           />
         )}
       </Dialog>
-    </div>
-  );
-}
-
-const LIKE_STATUS_MESSAGES: Record<string, string> = {
-  applied: "いいね済みです。企業からの返事を待っています。",
-  matched: "マッチしました。企業から登録メールアドレスに連絡が届きます。",
-  declined: "今回は見送りとなりました。",
-};
-
-/** 応募済み(反応待ち・マッチ・見送り)の状況 */
-function LikeStatus({ like }: { like: NonNullable<JobMyStatus["like"]> }) {
-  return (
-    <div
-      className={cn(
-        "flex flex-col gap-2 border-2 p-4 text-sm",
-        like.status.value === "matched"
-          ? "border-primary bg-tint text-primary"
-          : "border-line-soft bg-page text-ink-body",
-      )}
-    >
-      <p className="flex items-center gap-2 font-bold">
-        <Heart className="size-4 fill-current text-accent" aria-hidden />
-        {like.status.label}
-      </p>
-      <p>{LIKE_STATUS_MESSAGES[like.status.value]}</p>
-      <Link
-        href={`/likes/${like.id}`}
-        className="self-start font-bold text-primary underline underline-offset-4"
-      >
-        応募の詳細を見る
-      </Link>
     </div>
   );
 }
