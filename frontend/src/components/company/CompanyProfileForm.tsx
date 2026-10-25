@@ -2,12 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ExternalLink } from "lucide-react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 
 import { AvatarInput } from "@/components/images/AvatarInput";
 import { GalleryInput } from "@/components/images/GalleryInput";
-import { Button, buttonClass } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { describedBy, Field, FieldGroup } from "@/components/ui/Field";
 import { FormAlert } from "@/components/ui/FormAlert";
 import { FormField } from "@/components/ui/FormField";
@@ -125,20 +124,9 @@ function CompanyProfileForm({ company, masters }: CompanyProfileFormProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <p className="text-sm text-ink-body">
-          求職者が見る企業ページの内容です。
-        </p>
-        <a
-          href={`/companies/${company.id}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={buttonClass({ variant: "secondary" })}
-        >
-          企業ページを見る
-          <ExternalLink className="size-4" aria-hidden />
-        </a>
-      </div>
+      <p className="text-sm text-ink-body">
+        求職者が見る企業ページの内容です。
+      </p>
 
       <FormSection title="ロゴ">
         <AvatarInput
