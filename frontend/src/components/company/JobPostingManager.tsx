@@ -1,19 +1,20 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CircleAlert, ExternalLink, Heart, Users } from "lucide-react";
+import { CircleAlert, Heart, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { type ReactNode, useState } from "react";
+import { useState } from "react";
 
+import { JobConditions } from "@/components/jobs/JobConditions";
 import { SelectionSteps } from "@/components/jobs/SelectionSteps";
 import { Button, buttonClass } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { FormAlert } from "@/components/ui/FormAlert";
+import { Gallery } from "@/components/ui/Gallery";
 import { QueryErrorNotice } from "@/components/ui/QueryErrorNotice";
 import { MultilineText, PageSection } from "@/components/ui/PageSection";
-import { Tag } from "@/components/ui/Tag";
 import { apiClientFetch } from "@/lib/api/client";
 import type { CompanyJobPosting } from "@/lib/api/types";
 import {
@@ -21,7 +22,6 @@ import {
   companyQueryKeys,
 } from "@/lib/company/queries";
 import { errorMessage } from "@/lib/forms/applyServerErrors";
-import { formatSalary } from "@/lib/jobs/format";
 
 import { JobPostingStatusBadge } from "./JobPostingStatusBadge";
 
@@ -55,7 +55,7 @@ const CONFIRMATIONS: Record<
 };
 
 /**
- * 求人の詳細(管理)。内容の確認と、公開・募集終了・募集再開・削除・編集の操作を置く
+ * 求人の詳細(管理)。公開ページと同じ並びで内容を見せ、サイドバーに公開・募集終了・募集再開・編集・削除の操作を置く
  */
 export function JobPostingManager({ id }: { id: number }) {
   const router = useRouter();
@@ -121,100 +121,82 @@ export function JobPostingManager({ id }: { id: number }) {
   const canDelete = jobPosting.likes_count === 0;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       <FormAlert message={act.isError ? errorMessage(act.error) : undefined} />
 
       <header className="flex flex-col gap-3">
         <div>
           <JobPostingStatusBadge status={jobPosting.status} />
         </div>
-        <h1 className="text-2xl leading-snug font-black text-primary">
+        <h1 className="text-2xl leading-snug font-black text-primary sm:text-3xl">
           {jobPosting.title}
         </h1>
         <ApplicationSummary jobPosting={jobPosting} />
       </header>
 
-      <div className="flex flex-wrap gap-3">
-        {status === "draft" && (
-          <Button withShadow onClick={() => setConfirming("publish")}>
-            公開する
-          </Button>
-        )}
-        {status === "published" && (
-          <Button variant="secondary" onClick={() => setConfirming("close")}>
-            募集を終了する
-          </Button>
-        )}
-        {status === "closed" && (
-          <Button withShadow onClick={() => setConfirming("publish")}>
-            募集を再開する
-          </Button>
-        )}
-        <Link
-          href={`/company/job-postings/${id}/edit`}
-          className={buttonClass({ variant: "secondary" })}
-        >
-          編集する
-        </Link>
-        {status !== "draft" && (
-          <a
-            href={`/jobs/${id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={buttonClass({ variant: "secondary" })}
-          >
-            公開ページを見る
-            <ExternalLink className="size-4" aria-hidden />
-          </a>
-        )}
-        {canDelete && (
-          <Button variant="secondary" onClick={() => setConfirming("delete")}>
-            削除する
-          </Button>
-        )}
+      {/* 公開ページの求人詳細と同じ並び。公開ページで企業カードがある場所に、求人の操作を置く */}
+      <div className="grid items-start gap-8 lg:grid-cols-[1fr_320px] lg:gap-10">
+        {/* スマホでは条件と操作を本文より先に見せる */}
+        <aside className="lg:sticky lg:top-6 lg:order-last">
+          <div className="flex flex-col gap-5">
+            <JobConditions job={jobPosting} />
+            <Card>
+              <h2 className="border-b-2 border-primary bg-tint px-5 py-4 font-bold text-primary">
+                求人の操作
+              </h2>
+              <div className="flex flex-col gap-3 px-5 py-5">
+                {status === "draft" && (
+                  <Button withShadow onClick={() => setConfirming("publish")}>
+                    公開する
+                  </Button>
+                )}
+                {status === "published" && (
+                  <Button
+                    variant="secondary"
+                    onClick={() => setConfirming("close")}
+                  >
+                    募集を終了する
+                  </Button>
+                )}
+                {status === "closed" && (
+                  <Button withShadow onClick={() => setConfirming("publish")}>
+                    募集を再開する
+                  </Button>
+                )}
+                <Link
+                  href={`/company/job-postings/${id}/edit`}
+                  className={buttonClass({ variant: "secondary" })}
+                >
+                  編集する
+                </Link>
+                {canDelete && (
+                  // 元に戻せない操作のため赤にする(押すと確認ダイアログを出す)
+                  <Button
+                    variant="accent"
+                    onClick={() => setConfirming("delete")}
+                  >
+                    削除する
+                  </Button>
+                )}
+              </div>
+            </Card>
+          </div>
+        </aside>
+
+        <div className="flex min-w-0 flex-col gap-10">
+          <Gallery images={jobPosting.images ?? []} title={jobPosting.title} />
+
+          <PageSection title="仕事内容">
+            <MultilineText text={jobPosting.description} />
+          </PageSection>
+          <PageSection title="求める人材">
+            <MultilineText text={jobPosting.desired_candidate} />
+          </PageSection>
+          <PageSection title="選考フロー">
+            <SelectionSteps steps={jobPosting.selection_steps} />
+          </PageSection>
+        </div>
       </div>
-
-      <Card className="px-5 py-5">
-        <dl className="grid gap-4 text-sm sm:grid-cols-2">
-          <Condition label="職種">
-            <span className="flex flex-wrap gap-1.5">
-              {jobPosting.job_categories.map((jobCategory) => (
-                <Tag key={jobCategory.id} variant="solid">
-                  {jobCategory.name}
-                </Tag>
-              ))}
-            </span>
-          </Condition>
-          <Condition label="技術">
-            {jobPosting.tech_stacks && jobPosting.tech_stacks.length > 0 ? (
-              <span className="flex flex-wrap gap-1.5">
-                {jobPosting.tech_stacks.map((techStack) => (
-                  <Tag key={techStack.id}>{techStack.name}</Tag>
-                ))}
-              </span>
-            ) : (
-              <span className="text-ink-sub">未設定</span>
-            )}
-          </Condition>
-          <Condition label="雇用形態">
-            {jobPosting.employment_type.label}
-          </Condition>
-          <Condition label="勤務地">{jobPosting.prefecture.label}</Condition>
-          <Condition label="月給">
-            {formatSalary(jobPosting.salary)}円
-          </Condition>
-        </dl>
-      </Card>
-
-      <PageSection title="仕事内容">
-        <MultilineText text={jobPosting.description} />
-      </PageSection>
-      <PageSection title="求める人材">
-        <MultilineText text={jobPosting.desired_candidate} />
-      </PageSection>
-      <PageSection title="選考フロー">
-        <SelectionSteps steps={jobPosting.selection_steps} />
-      </PageSection>
 
       {confirming && (
         <ConfirmDialog
@@ -268,21 +250,6 @@ function ApplicationSummary({ jobPosting }: { jobPosting: CompanyJobPosting }) {
           この求人の応募者を見る
         </Link>
       )}
-    </div>
-  );
-}
-
-function Condition({
-  label,
-  children,
-}: {
-  label: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="grid grid-cols-[4.5rem_1fr] items-start gap-2">
-      <dt className="pt-0.5 text-xs font-bold text-ink-sub">{label}</dt>
-      <dd className="text-ink-body">{children}</dd>
     </div>
   );
 }

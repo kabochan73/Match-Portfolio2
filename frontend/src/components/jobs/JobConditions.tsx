@@ -7,12 +7,21 @@ import type { JobPostingDetail } from "@/lib/api/types";
 import { formatSalary } from "@/lib/jobs/format";
 
 type JobConditionsProps = {
-  job: JobPostingDetail;
+  /** 使う項目だけを受け取り、企業の求人管理の詳細からも渡せるようにする */
+  job: Pick<
+    JobPostingDetail,
+    | "salary"
+    | "prefecture"
+    | "employment_type"
+    | "job_categories"
+    | "tech_stacks"
+    | "likes_count"
+  >;
 };
 
 /**
  * 求人詳細の条件(月給・勤務地・雇用形態・職種・技術スタック・いいね数)。PCでは右の列に置き、スクロールしても画面に残す。
- * いいね(応募)・ブックマークのボタンは、それぞれの機能を作るときにこのカードの下に加える
+ * 求人管理の詳細でも、公開ページと同じ見え方を確かめられるよう同じカードを使う
  */
 export function JobConditions({ job }: JobConditionsProps) {
   return (

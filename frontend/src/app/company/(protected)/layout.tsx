@@ -14,7 +14,8 @@ export default function CompanyProtectedLayout({
   return (
     <>
       <CompanyAdminHeader />
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
+      {/* 公開ページと同じ並びにする求人の詳細は、data-layout="wide"を付けて公開ページと同じ幅に広げる */}
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 has-[[data-layout=wide]]:max-w-7xl sm:px-6 sm:py-10">
         <Suspense fallback={<div className="h-64 animate-pulse bg-tint" />}>
           <RequireSignedIn as="company">{children}</RequireSignedIn>
         </Suspense>
