@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 
 import { JobPostingTable } from "@/components/company/JobPostingTable";
 import { buttonClass } from "@/components/ui/Button";
@@ -9,7 +10,8 @@ export const metadata: Metadata = {
 };
 
 /**
- * 求人管理(自社の求人の一覧)。一覧は本人専用のため、ブラウザからTanStack Queryで取得する
+ * 求人管理(自社の求人の一覧)。一覧は本人専用のため、ブラウザからTanStack Queryで取得する。
+ * タブはURLで持つため、URLを読む一覧を<Suspense>で囲む
  */
 export default function CompanyJobPostingsPage() {
   return (
@@ -23,7 +25,13 @@ export default function CompanyJobPostingsPage() {
           求人を作成
         </Link>
       </div>
-      <JobPostingTable />
+      <Suspense
+        fallback={
+          <div className="h-64 animate-pulse border-2 border-primary/30 bg-white" />
+        }
+      >
+        <JobPostingTable />
+      </Suspense>
     </div>
   );
 }
