@@ -109,10 +109,10 @@ class DemoCompanySeeder extends Seeder
 
     /**
      * @param  list<string>  $names
-     * @return list<int>
+     * @return array<int, int>
      */
     private function techStackIds(array $names): array
     {
-        return TechStack::query()->whereIn('name', $names)->pluck('id')->all();
+        return TechStack::query()->whereIn('name', $names)->pluck('id')->map(fn (mixed $id): int => (int) $id)->all();
     }
 }

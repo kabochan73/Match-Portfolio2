@@ -1,0 +1,12 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app/
+        - database/
+        - routes/
+    # 7: 型の不一致まで見る(8以上のnullの扱いは、リレーションの注釈が増えるため見送り)
+    level: 7
+    # モデルのcasts()はPHPDocでarray<string, string>と書いているため、宣言の型ではなく中身を読んでenumや日時の型を知る
+    parseModelCastsMethod: true

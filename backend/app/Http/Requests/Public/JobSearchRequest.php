@@ -59,7 +59,8 @@ class JobSearchRequest extends FormRequest
             return [];
         }
 
-        return preg_split('/[\s　]+/u', $keyword, flags: PREG_SPLIT_NO_EMPTY);
+        // preg_splitは失敗するとfalseを返すため、そのときは空にする
+        return preg_split('/[\s　]+/u', $keyword, flags: PREG_SPLIT_NO_EMPTY) ?: [];
     }
 
     public function sort(): string

@@ -104,14 +104,11 @@ class AuthController extends Controller
 
     /**
      * このコントローラーで使うセッションガード。
-     * Auth::guard()の戻り値はインターフェース型のため、SessionGuard固有のメソッド(getLastAttempted)を型安全に使えるようにする
+     * SessionGuard固有のメソッド(getLastAttempted)を使うため、戻り値をSessionGuardにする(設定のドライバーがsessionのため、実際にSessionGuardが返る)
      */
     private function sessionGuard(): SessionGuard
     {
-        $guard = Auth::guard(self::GUARD);
-        assert($guard instanceof SessionGuard);
-
-        return $guard;
+        return Auth::guard(self::GUARD);
     }
 
     /**
