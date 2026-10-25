@@ -12,8 +12,11 @@ import type {
   Wrapped,
 } from "@/lib/api/types";
 
-/** いいね数・人気順の反映を最大5分遅らせて、キャッシュを効かせる */
-const LIKE_COUNT_REVALIDATE_SECONDS = 300;
+/**
+ * 求人一覧の作り直しの間隔。検索条件ごとにキャッシュがあるため、いいねのたびには作り直さず、
+ * いいね数・人気順の反映を最大5分遅らせる(公開・募集終了・削除のときは、Laravelからの通知ですぐ作り直す)
+ */
+const JOB_LIST_REVALIDATE_SECONDS = 300;
 
 export type JobSearchParams = {
   jobCategoryIds?: number[];
@@ -52,25 +55,28 @@ async function fetchJobs(
   queryString: string,
 ): Promise<Paginated<JobPostingSummary>> {
   "use cache";
-  cacheLife({ revalidate: LIKE_COUNT_REVALIDATE_SECONDS });
+  cacheLife({ revalidate: JOB_LIST_REVALIDATE_SECONDS });
   cacheTag("jobs");
 
   return apiPublicFetch<Paginated<JobPostingSummary>>(`/jobs?${queryString}`);
 }
 
 /**
- * 求人の詳細(公開中・募集終了)。見つからない(下書き・存在しない)場合はnull
+ * 求人の詳細(公開中・募集終了)。見つからない(下書き・存在しない)場合はnull。
+ * 求人の変更・いいねのときにLaravelから通知が届き、job-{id}のタグで作り直す。
+ * 会社カードも含むため、企業ページの編集でも作り直せるようcompany-{id}のタグも付ける。
+ * 通知が届かなかったときの保険として、1日たったら作り直す
  */
 export async function getJob(id: number): Promise<JobPostingDetail | null> {
   "use cache";
-  cacheLife({ revalidate: LIKE_COUNT_REVALIDATE_SECONDS });
-  // 求人ごとのタグで、企業が編集したときにこの求人だけを再検証できるようにする
-  cacheTag(`job-${id}`, "jobs");
+  cacheLife("days");
+  cacheTag(`job-${id}`);
 
   try {
     const { data } = await apiPublicFetch<Wrapped<JobPostingDetail>>(
       `/jobs/${id}`,
     );
+    cacheTag(`company-${data.company.id}`);
 
     return data;
   } catch (error) {

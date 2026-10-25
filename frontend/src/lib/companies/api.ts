@@ -6,16 +6,14 @@ import { ApiError } from "@/lib/api/errors";
 import { apiPublicFetch } from "@/lib/api/server";
 import type { PublicCompany, Wrapped } from "@/lib/api/types";
 
-/** 求人一覧・求人詳細とそろえ、編集・求人の公開・いいね数の反映を最大5分遅らせる */
-const COMPANY_REVALIDATE_SECONDS = 300;
-
 /**
  * 企業ページ(募集中の求人を含む)。見つからない場合はnull。
- * Laravelからの再検証の通知はまだないため、時間での再検証(5分)だけで更新する
+ * 企業ページの編集・求人の変更・いいねのときにLaravelから通知が届き、company-{id}のタグで作り直す。
+ * 通知が届かなかったときの保険として、1日たったら作り直す
  */
 export async function getCompany(id: number): Promise<PublicCompany | null> {
   "use cache";
-  cacheLife({ revalidate: COMPANY_REVALIDATE_SECONDS });
+  cacheLife("days");
   cacheTag(`company-${id}`);
 
   try {

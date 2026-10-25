@@ -16,6 +16,13 @@ export function siteUrl(): string {
   return requireEnv("SITE_URL");
 }
 
+/**
+ * Laravelからの再検証の通知(/internal/revalidate)の合言葉。LaravelのREVALIDATE_SECRETと同じ値にする
+ */
+export function revalidateSecret(): string {
+  return requireEnv("REVALIDATE_SECRET");
+}
+
 function requireEnv(name: string): string {
   const value = process.env[name];
 
