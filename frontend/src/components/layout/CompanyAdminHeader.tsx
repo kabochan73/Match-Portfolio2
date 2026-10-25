@@ -1,7 +1,9 @@
+import { Building2 } from "lucide-react";
 import { Suspense } from "react";
 
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
+import { IconLink } from "@/components/ui/IconLink";
 
 import { AdminNavLink, StaticAdminNavLink } from "./AdminNavLink";
 import { Logo } from "./Logo";
@@ -10,11 +12,10 @@ import { Logo } from "./Logo";
 const navLinks = [
   { href: "/company/job-postings", label: "求人管理" },
   { href: "/company/likes", label: "応募者" },
-  { href: "/company/profile/edit", label: "企業ページ編集" },
 ] as const;
 
 /**
- * 企業の管理画面のヘッダー。ナビ・通知のベル・ログアウトを置く
+ * 企業の管理画面のヘッダー。ロゴ以外(ナビ・通知のベル・企業ページ編集・ログアウト)は右に寄せる
  */
 export function CompanyAdminHeader() {
   return (
@@ -26,36 +27,39 @@ export function CompanyAdminHeader() {
             for Companies
           </span>
         </div>
-        {/* PCではロゴとボタンの間に置く。スマホでは2行目に回し、入りきらなければ横にスクロールする */}
-        <nav
-          aria-label="管理画面"
-          className="order-last flex w-full gap-6 overflow-x-auto md:order-none md:w-auto md:flex-1"
-        >
-          {/* 今いるページの下線はURLを読んで決めるため、読むまでは下線なしのリンクを出す */}
-          <Suspense
-            fallback={navLinks.map((link) => (
-              <StaticAdminNavLink
-                key={link.href}
-                href={link.href}
-                label={link.label}
-              />
-            ))}
-          >
-            {navLinks.map((link) => (
-              <AdminNavLink
-                key={link.href}
-                href={link.href}
-                label={link.label}
-              />
-            ))}
-          </Suspense>
-        </nav>
-        <div className="flex items-center gap-3">
-          <NotificationBell role="company" href="/company/notifications" />
-          <LogoutButton
-            endpoint="/company/logout"
-            redirectTo="/for-companies"
-          />
+        {/* ナビとアイコンをまとめて右に寄せる(スマホではまとめて2行目に回る) */}
+        <div className="ml-auto flex items-center gap-6">
+          <nav aria-label="管理画面" className="flex gap-6">
+            {/* 今いるページの下線はURLを読んで決めるため、読むまでは下線なしのリンクを出す */}
+            <Suspense
+              fallback={navLinks.map((link) => (
+                <StaticAdminNavLink
+                  key={link.href}
+                  href={link.href}
+                  label={link.label}
+                />
+              ))}
+            >
+              {navLinks.map((link) => (
+                <AdminNavLink
+                  key={link.href}
+                  href={link.href}
+                  label={link.label}
+                />
+              ))}
+            </Suspense>
+          </nav>
+          <div className="flex items-center gap-3">
+            <NotificationBell role="company" href="/company/notifications" />
+            <IconLink href="/company/profile/edit" label="企業ページ編集">
+              <Building2 className="size-5" aria-hidden />
+            </IconLink>
+            <LogoutButton
+              endpoint="/company/logout"
+              redirectTo="/for-companies"
+              iconOnly
+            />
+          </div>
         </div>
       </div>
     </header>
