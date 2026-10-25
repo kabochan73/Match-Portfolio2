@@ -17,7 +17,7 @@ use Intervention\Image\Interfaces\ImageInterface;
 class DemoImages
 {
     /**
-     * ロゴ。背景色の正方形に、図形の色の丸を描く
+     * 企業のロゴ。背景色の正方形に、図形の色の丸を描く
      *
      * @return string 保存先の相対パス
      */
@@ -29,6 +29,22 @@ class DemoImages
             ->drawCircle(fn (CircleFactory $circle) => $circle->at(200, 200)->radius(110)->background($shape));
 
         return $this->store($image, 'avatars/companies');
+    }
+
+    /**
+     * 求職者のアイコン。人の形(頭と肩)に見えるよう、丸を2つ重ねる
+     *
+     * @return string 保存先の相対パス
+     */
+    public function seekerAvatar(string $background, string $shape): string
+    {
+        $image = ImageManager::usingDriver(GdDriver::class)
+            ->createImage(400, 400)
+            ->fill($background)
+            ->drawCircle(fn (CircleFactory $circle) => $circle->at(200, 160)->radius(80)->background($shape))
+            ->drawCircle(fn (CircleFactory $circle) => $circle->at(200, 420)->radius(160)->background($shape));
+
+        return $this->store($image, 'avatars/users');
     }
 
     /**

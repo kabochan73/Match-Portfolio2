@@ -3,8 +3,10 @@
 use App\Enums\JobPostingStatus;
 use App\Models\Company;
 use App\Models\JobPosting;
+use App\Models\User;
 use Database\Seeders\DemoCompanySeeder;
 use Database\Seeders\DemoImages;
+use Database\Seeders\DemoSeekerSeeder;
 use Database\Seeders\MasterSeeder;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -32,6 +34,11 @@ beforeEach(function () {
         public function photo(string $directory, string $background, string $shape, int $variant = 0): string
         {
             return $this->fakeImage($directory);
+        }
+
+        public function seekerAvatar(string $background, string $shape): string
+        {
+            return $this->fakeImage('avatars/users');
         }
 
         private function fakeImage(string $directory): string
@@ -110,5 +117,55 @@ describe('companies and job postings', function () {
         $this->seed(DemoCompanySeeder::class);
 
         expect(Company::count())->toBe(count($this->data));
+    });
+});
+
+describe('seekers', function () {
+    beforeEach(function () {
+        $this->seed(DemoSeekerSeeder::class);
+        $this->data = require database_path('seeders/data/demo_seekers.php');
+    });
+
+    it('creates every seeker within the limits the forms allow', function () {
+        expect(User::count())->toBe(count($this->data));
+
+        foreach ($this->data as $data) {
+            $user = User::query()->where('email', $data['email'])->firstOrFail();
+
+            expect($user->age())->toBe($data['age'], "{$data['name']}の年齢")
+                ->toBeBetween(18, 60)
+                ->and(mb_strlen($user->comment))->toBeLessThanOrEqual(200)
+                ->and($user->workExperiences()->count())->toBe(count($data['work_experiences']))
+                ->and($user->educations()->count())->toBe(count($data['educations']))
+                ->and($user->certifications()->count())->toBe(count($data['certifications']));
+
+            // 職歴は未来の年月にならず、退社は入社より前にならない
+            $user->workExperiences->each(fn ($work) => expect($work->started_on->lte(now()))->toBeTrue()
+                ->and($work->ended_on === null || $work->ended_on->gte($work->started_on))->toBeTrue());
+        }
+    });
+
+    it('fills every profile item of the demo seeker, who is the only one that can log in', function () {
+        $seeker = User::query()->where('email', DemoSeekerSeeder::EMAIL)->firstOrFail();
+
+        expect($seeker)
+            ->comment->not->toBeNull()
+            ->portfolio_url->not->toBeNull()
+            ->avatar_path->not->toBeNull()
+            ->and($seeker->workExperiences()->exists())->toBeTrue()
+            ->and($seeker->educations()->exists())->toBeTrue()
+            ->and($seeker->certifications()->exists())->toBeTrue();
+
+        $this->postJson('/api/seeker/login', [
+            'email' => DemoSeekerSeeder::EMAIL,
+            'password' => DemoSeekerSeeder::PASSWORD,
+        ])->assertOk();
+
+        $this->postJson('/api/seeker/logout')->assertNoContent();
+
+        $this->postJson('/api/seeker/login', [
+            'email' => $this->data[1]['email'],
+            'password' => DemoSeekerSeeder::PASSWORD,
+        ])->assertUnprocessable();
     });
 });
