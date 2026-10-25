@@ -73,6 +73,13 @@ jobs:
       run:
         working-directory: frontend
 
+    # next.config.tsが読む環境変数(型の生成・ビルドで使う)。
+    # ビルドは本番のビルド環境と同じく、Laravelに繋がらない状態で行い、ビルド中にAPIを呼ぶページがあれば失敗させる
+    env:
+      API_INTERNAL_URL: http://127.0.0.1:9
+      SITE_URL: http://localhost:3000
+      REVALIDATE_SECRET: ci-dummy-secret
+
     steps:
       - uses: actions/checkout@v4
 
@@ -90,17 +97,12 @@ jobs:
       - name: Prettier
         run: npm run format:check
 
+      # PagePropsなどのルートの型は、Next.jsが.next/typesに生成する(手元ではnext devが作るが、CIでは先に作る)
       - name: TypeScript
-        run: npx tsc --noEmit
+        run: npm run typecheck
 
       - name: Vitest
         run: npm test
 
-      # 本番のビルド環境と同じく、Laravelに繋がらない状態でビルドできるかを確かめる
-      # (ビルド中にAPIを呼ぶページがあると、ここで失敗する)
       - name: Build
         run: npm run build
-        env:
-          API_INTERNAL_URL: http://127.0.0.1:9
-          SITE_URL: http://localhost:3000
-          REVALIDATE_SECRET: ci-dummy-secret
