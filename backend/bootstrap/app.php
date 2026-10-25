@@ -16,6 +16,11 @@ return Application::configure(basePath: dirname(__DIR__))
         // SANCTUM_STATEFUL_DOMAINS(フロントエンド)からの/apiリクエストで、セッションCookieとCSRF保護を使えるようにする。
         // ログイン状態の確認はSanctumではなく、各ガード(auth:web / auth:company)で行う
         $middleware->statefulApi();
+
+        // 本番ではブラウザ → Railwayの入口 → Next.js(rewrites)→ Laravelと中継される。
+        // すぐ手前(Next.js)が付けたX-Forwarded-Forを信頼し、IPごとの回数制限などで本当のIPを使えるようにする。
+        // Laravelは公開URLを持たずNext.jsからしか届かないため、すぐ手前を信頼しても外から偽のIPは名乗れない
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

@@ -35,10 +35,10 @@ Route::get('companies/{company}', [PublicCompanyController::class, 'show']);
 
 // 求職者本人の操作(/api/seeker/...)
 Route::prefix('seeker')->group(function () {
-    Route::post('register', [SeekerAuthController::class, 'register']);
-    Route::post('login', [SeekerAuthController::class, 'login']);
-    Route::post('forgot-password', [SeekerPasswordResetController::class, 'forgotPassword']);
-    Route::post('reset-password', [SeekerPasswordResetController::class, 'resetPassword']);
+    Route::post('register', [SeekerAuthController::class, 'register'])->middleware('throttle:register');
+    Route::post('login', [SeekerAuthController::class, 'login'])->middleware('throttle:login');
+    Route::post('forgot-password', [SeekerPasswordResetController::class, 'forgotPassword'])->middleware('throttle:password-reset');
+    Route::post('reset-password', [SeekerPasswordResetController::class, 'resetPassword'])->middleware('throttle:password-reset');
 
     Route::middleware('auth:web')->group(function () {
         Route::post('logout', [SeekerAuthController::class, 'logout']);
@@ -71,10 +71,10 @@ Route::prefix('seeker')->group(function () {
 
 // 企業本人の操作(/api/company/...)
 Route::prefix('company')->group(function () {
-    Route::post('register', [CompanyAuthController::class, 'register']);
-    Route::post('login', [CompanyAuthController::class, 'login']);
-    Route::post('forgot-password', [CompanyPasswordResetController::class, 'forgotPassword']);
-    Route::post('reset-password', [CompanyPasswordResetController::class, 'resetPassword']);
+    Route::post('register', [CompanyAuthController::class, 'register'])->middleware('throttle:register');
+    Route::post('login', [CompanyAuthController::class, 'login'])->middleware('throttle:login');
+    Route::post('forgot-password', [CompanyPasswordResetController::class, 'forgotPassword'])->middleware('throttle:password-reset');
+    Route::post('reset-password', [CompanyPasswordResetController::class, 'resetPassword'])->middleware('throttle:password-reset');
 
     Route::middleware('auth:company')->group(function () {
         Route::post('logout', [CompanyAuthController::class, 'logout']);
