@@ -89,8 +89,7 @@ export function CompanyProfileLayout({
 
           <PageSection title={`募集中の求人(${jobPostings.length}件)`}>
             {jobPostings.length > 0 ? (
-              // 本文の列が十分に広いPC(xl以上)では3列。それより狭いと3列ではカードの下端の行が詰まるため2列
-              <ul className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              <ul className="grid gap-6 sm:grid-cols-2">
                 {jobPostings.map((job) => (
                   <li key={job.id}>
                     <JobCard job={job} href={jobHref?.(job.id)} />
