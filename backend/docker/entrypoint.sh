@@ -3,10 +3,10 @@ set -e
 
 php artisan config:clear
 
-# schedulerサービス(RUN_MODE=scheduler)はnginx/php-fpmを起動しない。
-# RailwayのCron Schedule(毎分起動)でこのコンテナを立ち上げ、schedule:runを1回実行して終了する
+# schedulerサービス(RUN_MODE=scheduler)はnginx/php-fpmを起動せず、schedule:workで常に動かす。
+# RailwayのCronは最短5分間隔で実行時刻が数分ずれるため、毎分起動するschedule:runでは「毎時0分」のタスクが飛ばされうる
 if [ "$RUN_MODE" = "scheduler" ]; then
-  exec php artisan schedule:run
+  exec php artisan schedule:work
 fi
 
 # RailwayはPORT環境変数を動的に渡してくるため、コンテナ起動時にnginx設定へ反映する
