@@ -1,9 +1,13 @@
 <?php
 
 use App\Enums\JobPostingStatus;
+use App\Enums\LikeStatus;
+use App\Enums\LikeType;
 use App\Models\Company;
 use App\Models\JobPosting;
+use App\Models\Like;
 use App\Models\User;
+use Database\Seeders\DemoActivitySeeder;
 use Database\Seeders\DemoCompanySeeder;
 use Database\Seeders\DemoImages;
 use Database\Seeders\DemoSeekerSeeder;
@@ -167,5 +171,72 @@ describe('seekers', function () {
             'email' => $this->data[1]['email'],
             'password' => DemoSeekerSeeder::PASSWORD,
         ])->assertUnprocessable();
+    });
+});
+
+describe('likes, bookmarks, and notifications', function () {
+    beforeEach(function () {
+        $this->seed([DemoCompanySeeder::class, DemoSeekerSeeder::class, DemoActivitySeeder::class]);
+        $this->demoSeeker = User::query()->where('email', DemoSeekerSeeder::EMAIL)->firstOrFail();
+        $this->demoCompany = Company::query()->where('email', DemoCompanySeeder::EMAIL)->firstOrFail();
+    });
+
+    it('gives the demo seeker likes in every status and leaves likes to try this month', function () {
+        expect($this->demoSeeker->likes()->pluck('status')->countBy(fn (LikeStatus $status) => $status->value)->all())
+            ->toEqual(['applied' => 2, 'matched' => 1, 'declined' => 1, 'expired' => 1])
+            ->and($this->demoSeeker->bookmarks()->count())->toBe(3);
+
+        $this->actingAs($this->demoSeeker, 'web')
+            ->getJson('/api/seeker/like-quota')
+            ->assertOk()
+            ->assertJsonPath('data.standard.remaining', 3)
+            ->assertJsonPath('data.super.remaining', 1);
+    });
+
+    it('gives the demo company applicants in every tab, including one close to the deadline', function () {
+        $this->actingAs($this->demoCompany, 'company')
+            ->getJson('/api/company/likes')
+            ->assertOk()
+            ->assertJsonPath('meta.counts', ['applied' => 4, 'matched' => 2, 'unsuccessful' => 3]);
+
+        $deadlines = Like::query()->whereIn('job_posting_id', $this->demoCompany->jobPostings()->pluck('id'))
+            ->where('status', LikeStatus::Applied)->pluck('response_deadline');
+        expect($deadlines->contains(fn ($deadline) => now()->diffInDays($deadline) <= 3))->toBeTrue();
+    });
+
+    it('creates likes the real rules would allow', function () {
+        // 反応待ちは期限内、結果が出たものだけが返事の日時を持つ
+        Like::all()->each(fn (Like $like) => expect($like->status === LikeStatus::Applied ? $like->response_deadline->isFuture() : true)->toBeTrue()
+            ->and(in_array($like->status, [LikeStatus::Matched, LikeStatus::Declined], true) === ($like->responded_at !== null))->toBeTrue());
+
+        // 同じ求人へのいいねは1人1件、今月のいいねは種類ごとの上限まで
+        $since = Like::currentQuotaPeriodStart();
+        User::all()->each(function (User $user) use ($since) {
+            expect($user->likes()->pluck('job_posting_id')->duplicates())->toBeEmpty();
+
+            foreach (LikeType::cases() as $likeType) {
+                expect($user->likes()->where('like_type', $likeType)->where('created_at', '>=', $since)->count())
+                    ->toBeLessThanOrEqual($likeType->monthlyLimit());
+            }
+        });
+
+        // 下書きの求人にはいいねがない
+        expect(Like::query()->whereHas('jobPosting', fn ($query) => $query->where('status', JobPostingStatus::Draft))->exists())->toBeFalse();
+    });
+
+    it('sends notifications to both demo accounts, mixing read and unread', function () {
+        foreach ([$this->demoSeeker, $this->demoCompany] as $notifiable) {
+            expect($notifiable->notifications()->count())->toBeGreaterThan(0)
+                ->and($notifiable->unreadNotifications()->count())->toBeGreaterThan(0)
+                ->and($notifiable->readNotifications()->count())->toBeGreaterThan(0);
+        }
+    });
+
+    it('does nothing when run again', function () {
+        $count = Like::count();
+
+        $this->seed(DemoActivitySeeder::class);
+
+        expect(Like::count())->toBe($count);
     });
 });
