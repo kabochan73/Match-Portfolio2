@@ -5,6 +5,7 @@ import { ApiError, ValidationError } from "@/lib/api/errors";
 import {
   applyServerErrors,
   errorMessage,
+  TOO_MANY_REQUESTS_MESSAGE,
   UNEXPECTED_ERROR_MESSAGE,
 } from "./applyServerErrors";
 
@@ -76,6 +77,25 @@ describe("applyServerErrors", () => {
     expect(setError).toHaveBeenNthCalledWith(1, "root", {
       message: UNEXPECTED_ERROR_MESSAGE,
     });
+  });
+});
+
+describe("too many requests (429)", () => {
+  it("tells the user to wait instead of reporting a connection failure", () => {
+    const setError = vi.fn();
+
+    applyServerErrors<Values>(
+      new ApiError(429, "Too Many Attempts."),
+      setError,
+      ["email"],
+    );
+
+    expect(setError).toHaveBeenCalledWith("root", {
+      message: TOO_MANY_REQUESTS_MESSAGE,
+    });
+    expect(errorMessage(new ApiError(429, "Too Many Attempts."))).toBe(
+      TOO_MANY_REQUESTS_MESSAGE,
+    );
   });
 });
 
