@@ -240,3 +240,14 @@ describe('likes, bookmarks, and notifications', function () {
         expect(Like::count())->toBe($count);
     });
 });
+
+it('builds the masters and every demo account with the default seeder', function () {
+    // beforeEachでマスタを入れているため、作り直してから既定のseederだけで確かめる
+    $this->artisan('migrate:fresh')->assertSuccessful();
+
+    $this->seed();
+
+    expect(User::query()->where('email', DemoSeekerSeeder::EMAIL)->exists())->toBeTrue()
+        ->and(Company::query()->where('email', DemoCompanySeeder::EMAIL)->exists())->toBeTrue()
+        ->and(Like::query()->exists())->toBeTrue();
+});

@@ -43,7 +43,14 @@ export default function LoginPage() {
       <Suspense>
         <PasswordResetNotice />
       </Suspense>
-      <LoginForm endpoint="/seeker/login" defaultRedirect="/jobs" />
+      <LoginForm
+        endpoint="/seeker/login"
+        defaultRedirect="/jobs"
+        demoAccount={{
+          email: "demo-seeker@example.com",
+          password: "password1234",
+        }}
+      />
     </AuthCard>
   );
 }

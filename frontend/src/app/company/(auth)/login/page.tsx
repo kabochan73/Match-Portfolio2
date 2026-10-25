@@ -46,6 +46,10 @@ export default function CompanyLoginPage() {
       <LoginForm
         endpoint="/company/login"
         defaultRedirect="/company/job-postings"
+        demoAccount={{
+          email: "demo-company@example.com",
+          password: "password1234",
+        }}
       />
     </AuthCard>
   );

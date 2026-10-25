@@ -10,10 +10,13 @@ class DatabaseSeeder extends Seeder
     use WithoutModelEvents;
 
     /**
-     * Seed the application's database.
+     * マスタとデモ用のデータを投入する(php artisan migrate:fresh --seed で、デモの状態を作り直せる)
      */
     public function run(): void
     {
-        $this->call(MasterSeeder::class);
+        $this->call([
+            MasterSeeder::class,
+            DemoSeeder::class,
+        ]);
     }
 }
