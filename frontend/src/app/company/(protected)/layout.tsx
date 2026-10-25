@@ -14,8 +14,11 @@ export default function CompanyProtectedLayout({
   return (
     <>
       <CompanyAdminHeader />
-      {/* 公開ページと同じ並びにする求人の詳細では、WideMainがdata-layout="wide"を付け、公開ページと同じ幅に広げる */}
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 data-[layout=wide]:max-w-7xl sm:px-6 sm:py-10">
+      {/*
+        公開ページと同じ並びにするページでは、WideMainがdata-layoutを付けて広げる。
+        wide(求人の詳細)は公開ページと同じ幅、full(企業ページ)は幅と余白の制限を外してページ側で枠を組む
+      */}
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 data-[layout=full]:max-w-none data-[layout=full]:p-0! data-[layout=wide]:max-w-7xl sm:px-6 sm:py-10">
         <Suspense fallback={<div className="h-64 animate-pulse bg-tint" />}>
           <RequireSignedIn as="company">{children}</RequireSignedIn>
         </Suspense>

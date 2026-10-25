@@ -15,7 +15,7 @@ const navLinks = [
 ] as const;
 
 /**
- * 企業の管理画面のヘッダー。ロゴ以外(ナビ・通知のベル・企業ページ編集・ログアウト)は右に寄せる
+ * 企業の管理画面のヘッダー。ロゴ以外(ナビ・通知のベル・企業ページ・ログアウト)は右に寄せる
  */
 export function CompanyAdminHeader() {
   return (
@@ -51,7 +51,7 @@ export function CompanyAdminHeader() {
           </nav>
           <div className="flex items-center gap-3">
             <NotificationBell role="company" href="/company/notifications" />
-            <IconLink href="/company/profile/edit" label="企業ページ編集">
+            <IconLink href="/company/profile" label="企業ページ">
               <Building2 className="size-5" aria-hidden />
             </IconLink>
             <LogoutButton
