@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { Suspense } from "react";
 
 import { JobCard } from "@/components/jobs/JobCard";
@@ -52,6 +53,8 @@ export default function JobsPage({ searchParams }: PageProps<"/jobs">) {
 }
 
 async function Sidebar({ searchParams }: SearchParamsProps) {
+  // 本番のビルド環境からはLaravelに繋がらないため、ビルド時ではなくアクセス時に取得する(取得結果はキャッシュされる)
+  await connection();
   const masters = await getMasters();
   const params = parseJobSearchParams(await searchParams, masters);
 
@@ -59,6 +62,7 @@ async function Sidebar({ searchParams }: SearchParamsProps) {
 }
 
 async function Results({ searchParams }: SearchParamsProps) {
+  await connection();
   const masters = await getMasters();
   const params = parseJobSearchParams(await searchParams, masters);
   const { data: jobs, meta } = await searchJobs(params);
