@@ -1,4 +1,4 @@
-import { Bookmark, Heart } from "lucide-react";
+import { Bookmark, Heart, UserRound } from "lucide-react";
 import Link from "next/link";
 
 import { LogoutButton } from "@/components/auth/LogoutButton";
@@ -22,28 +22,19 @@ export async function HeaderAccountMenu() {
     return <GuestMenu />;
   }
 
-  // スマホでは横に入りきらないため、アイコンを1行目、ボタンを2行目に並べる
   return (
-    <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto sm:flex-nowrap">
-      <div className="flex items-center gap-3">
-        <IconLink href="/likes" label="応募状況">
-          <Heart className="size-5" aria-hidden />
-        </IconLink>
-        <IconLink href="/bookmarks" label="ブックマーク">
-          <Bookmark className="size-5" aria-hidden />
-        </IconLink>
-        <NotificationBell role="seeker" href="/notifications" />
-      </div>
-      <div className={menuClass}>
-        <Link href="/mypage" className={cn(buttonClass(), buttonWidthClass)}>
-          マイページ
-        </Link>
-        <LogoutButton
-          endpoint="/seeker/logout"
-          redirectTo="/"
-          className={buttonWidthClass}
-        />
-      </div>
+    <div className="flex items-center gap-3">
+      <IconLink href="/likes" label="応募状況">
+        <Heart className="size-5" aria-hidden />
+      </IconLink>
+      <IconLink href="/bookmarks" label="ブックマーク">
+        <Bookmark className="size-5" aria-hidden />
+      </IconLink>
+      <NotificationBell role="seeker" href="/notifications" />
+      <IconLink href="/mypage" label="マイページ">
+        <UserRound className="size-5" aria-hidden />
+      </IconLink>
+      <LogoutButton endpoint="/seeker/logout" redirectTo="/" iconOnly />
     </div>
   );
 }

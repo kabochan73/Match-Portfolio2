@@ -10,15 +10,21 @@ type IconLinkProps = {
   badge?: number;
 };
 
+/** アイコンだけのリンク・ボタンの見た目(ログアウトボタンでも使う) */
+export const iconLinkClass =
+  "relative flex size-11 shrink-0 items-center justify-center text-primary transition hover:bg-tint disabled:cursor-not-allowed disabled:opacity-50";
+
 /**
- * ヘッダーに並べるアイコンのリンク(応募状況・ブックマーク・通知)
+ * ヘッダーに並べるアイコンのリンク(応募状況・ブックマーク・通知・マイページ)。
+ * アイコンだけでは意味がわかりにくいため、マウスを乗せると名前を出す
  */
 export function IconLink({ href, label, children, badge = 0 }: IconLinkProps) {
   return (
     <Link
       href={href}
       aria-label={label}
-      className="relative flex size-11 shrink-0 items-center justify-center text-primary transition hover:bg-tint"
+      title={label}
+      className={iconLinkClass}
     >
       {children}
       {badge > 0 && (
