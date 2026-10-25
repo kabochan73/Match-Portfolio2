@@ -3,9 +3,11 @@
 use App\Models\Company;
 use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
+use Symfony\Component\Mailer\Exception\TransportException;
 
 describe('forgot password', function () {
     it('sends a reset link that points to the company reset page', function () {
@@ -42,6 +44,19 @@ describe('forgot password', function () {
             ->assertOk();
 
         Notification::assertNotSentTo($seeker, ResetPassword::class);
+    });
+
+    it('returns the same response and reports the error when the mail cannot be sent', function () {
+        Exceptions::fake();
+        Company::factory()->create(['email' => 'hr@example.com']);
+        // 誰も待ち受けていないポートのSMTPに向け、メールの送信を実際に失敗させる
+        config(['mail.default' => 'smtp', 'mail.mailers.smtp.host' => '127.0.0.1', 'mail.mailers.smtp.port' => 1]);
+
+        $this->postJson('/api/company/forgot-password', ['email' => 'hr@example.com'])
+            ->assertOk()
+            ->assertJsonPath('message', '登録されているメールアドレスであれば、パスワード再設定用のメールを送信しました。');
+
+        Exceptions::assertReported(TransportException::class);
     });
 });
 

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password as PasswordRule;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 /**
  * 求職者のパスワードリセット(再設定リンクの送信・パスワードの再設定)
@@ -29,7 +30,13 @@ class PasswordResetController extends Controller
             'email' => ['required', 'string', 'email'],
         ]);
 
-        Password::broker(self::BROKER)->sendResetLink($request->only('email'));
+        try {
+            Password::broker(self::BROKER)->sendResetLink($request->only('email'));
+        } catch (TransportExceptionInterface $exception) {
+            // メールを送れなくても(独自ドメインのないResendは、自分以外の宛先に送れないなど)エラー画面にはせず、
+            // ログに残して同じメッセージを返す(登録されているかどうかを外に見せない作りとも合わせる)
+            report($exception);
+        }
 
         return response()->json([
             'message' => '登録されているメールアドレスであれば、パスワード再設定用のメールを送信しました。',
