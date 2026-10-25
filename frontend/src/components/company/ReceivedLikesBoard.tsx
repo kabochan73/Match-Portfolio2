@@ -159,7 +159,7 @@ export function ReceivedLikesBoard() {
 
 function ReceivedLikeRow({ like }: { like: ReceivedLike }) {
   return (
-    <li className="border-b-2 border-tint last:border-b-0">
+    <li className="border-b-2 border-primary last:border-b-0">
       <Link
         href={`/company/likes/${like.id}`}
         className="group flex gap-4 px-5 py-4 transition hover:bg-page"

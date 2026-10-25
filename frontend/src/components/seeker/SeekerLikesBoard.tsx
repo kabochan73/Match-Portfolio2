@@ -108,7 +108,7 @@ function SeekerLikeRow({ like }: { like: SeekerLike }) {
   const company = like.job_posting.company;
 
   return (
-    <li className="border-b-2 border-tint last:border-b-0">
+    <li className="border-b-2 border-primary last:border-b-0">
       <Link
         href={`/likes/${like.id}`}
         className="group flex gap-4 px-5 py-4 transition hover:bg-page"

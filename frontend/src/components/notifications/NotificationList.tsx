@@ -110,7 +110,7 @@ function NotificationItem({
   const unread = notification.read_at === null;
 
   return (
-    <li className="border-b-2 border-tint last:border-b-0">
+    <li className="border-b-2 border-primary last:border-b-0">
       <Link
         href={href}
         onClick={onOpen}

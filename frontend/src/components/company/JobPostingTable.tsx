@@ -65,7 +65,7 @@ export function JobPostingTable() {
 
 function JobPostingRow({ jobPosting }: { jobPosting: CompanyJobPosting }) {
   return (
-    <li className="border-b-2 border-tint last:border-b-0">
+    <li className="border-b-2 border-primary last:border-b-0">
       <Link
         href={`/company/job-postings/${jobPosting.id}`}
         className="group grid gap-3 px-5 py-4 transition hover:bg-page md:grid-cols-[1fr_7rem_10rem] md:items-center"
