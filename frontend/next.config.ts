@@ -8,6 +8,8 @@ if (!apiInternalUrl) {
 }
 
 const nextConfig: NextConfig = {
+  // 本番のDockerイメージを小さくするため、実行に必要なファイルだけを.next/standaloneに集める
+  output: "standalone",
   // Cache Components(Next.js 16の推奨のキャッシュ方式)。'use cache'でキャッシュする部分と、
   // <Suspense>の中でリクエストごとに描画する部分(ログイン状態など)を、1つのページの中で分けられる
   cacheComponents: true,
@@ -38,6 +40,11 @@ const nextConfig: NextConfig = {
       {
         source: "/sanctum/:path*",
         destination: `${apiInternalUrl}/sanctum/:path*`,
+      },
+      // アップロード画像。本番ではLaravelに公開URLを付けず、画像のURL(APP_URL/storage/...)もこのサイトのURLにして中継する
+      {
+        source: "/storage/:path*",
+        destination: `${apiInternalUrl}/storage/:path*`,
       },
     ];
   },

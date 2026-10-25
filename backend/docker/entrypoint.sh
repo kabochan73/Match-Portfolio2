@@ -17,6 +17,11 @@ envsubst '${PORT}' < /etc/nginx/http.d/default.conf.template > /etc/nginx/http.d
 # 本番の画像はRailway Bucketに保存するため、本番では使われない
 php artisan storage:link --force || true
 
+# 本番では画像の保存先(storage/app/public)にRailwayのVolumeをつなぐ。Volumeはrootの持ち物として用意されるため、
+# php-fpm(www-data)が画像を保存・削除できるよう、起動のたびに持ち主を合わせる
+mkdir -p storage/app/public
+chown -R www-data:www-data storage/app/public
+
 # 起動のたびに実行するが、未適用のマイグレーションだけが実行されるため何度実行しても安全
 php artisan migrate --force
 
