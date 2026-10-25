@@ -51,7 +51,7 @@ export function JobPostingTable() {
   );
 
   if (isPending) {
-    return <JobPostingTableSkeleton />;
+    return null;
   }
 
   if (isError) {
@@ -140,23 +140,6 @@ function JobPostingBadges({ jobPosting }: { jobPosting: CompanyJobPosting }) {
           件
         </span>
       )}
-    </div>
-  );
-}
-
-function JobPostingTableSkeleton() {
-  return (
-    <div className="flex animate-pulse flex-col gap-5">
-      <div className="h-7 w-32 bg-tint" />
-      <div className="h-11 border-b-2 border-primary/30" />
-      <div className="grid gap-6 sm:grid-cols-2">
-        {Array.from({ length: 4 }, (_, index) => (
-          <div
-            key={index}
-            className="h-80 border-2 border-primary/30 bg-white"
-          />
-        ))}
-      </div>
     </div>
   );
 }

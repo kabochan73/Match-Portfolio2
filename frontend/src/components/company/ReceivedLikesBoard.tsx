@@ -131,9 +131,7 @@ export function ReceivedLikesBoard() {
         </div>
       </div>
 
-      {isPending ? (
-        <div className="h-64 animate-pulse border-2 border-primary/30 bg-white" />
-      ) : isError ? (
+      {isPending ? null : isError ? (
         <FormAlert message={UNEXPECTED_ERROR_MESSAGE} />
       ) : data.data.length === 0 ? (
         <p className="border-2 border-dashed border-line-soft bg-white px-6 py-16 text-center text-sm text-ink-sub">

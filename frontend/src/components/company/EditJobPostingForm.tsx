@@ -29,9 +29,7 @@ export function EditJobPostingForm({ id }: { id: number }) {
   } = useQuery(companyJobPostingQueryOptions(id));
 
   if (isPending) {
-    return (
-      <div className="h-96 animate-pulse border-2 border-primary/30 bg-white" />
-    );
+    return null;
   }
 
   if (isError) {

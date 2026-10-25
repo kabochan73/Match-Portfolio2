@@ -19,11 +19,7 @@ export default function CompanyLikesPage() {
           応募には、7日以内に「気になる」か「見送り」を返してください。期限を過ぎると自動で不成立になります。
         </p>
       </div>
-      <Suspense
-        fallback={
-          <div className="h-64 animate-pulse border-2 border-primary/30 bg-white" />
-        }
-      >
+      <Suspense>
         <ReceivedLikesBoard />
       </Suspense>
     </div>

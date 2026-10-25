@@ -98,9 +98,7 @@ export function JobPostingForm({ jobPosting }: JobPostingFormProps) {
   });
 
   if (!masters) {
-    return (
-      <div className="h-96 animate-pulse border-2 border-primary/30 bg-white" />
-    );
+    return null;
   }
 
   return (

@@ -68,9 +68,7 @@ export function CompanyProfileEditor() {
   }
 
   if (!company || !masters) {
-    return (
-      <div className="h-96 animate-pulse border-2 border-primary/30 bg-white" />
-    );
+    return null;
   }
 
   return <CompanyProfileForm company={company} masters={masters} />;

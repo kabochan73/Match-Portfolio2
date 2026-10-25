@@ -14,11 +14,7 @@ export default function CompanyNotificationsPage() {
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-2xl font-black text-primary">通知</h1>
-      <Suspense
-        fallback={
-          <div className="h-64 animate-pulse border-2 border-primary/30 bg-white" />
-        }
-      >
+      <Suspense>
         <NotificationList
           role="company"
           basePath="/company/notifications"

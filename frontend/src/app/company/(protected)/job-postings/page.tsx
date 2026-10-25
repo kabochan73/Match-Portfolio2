@@ -25,11 +25,7 @@ export default function CompanyJobPostingsPage() {
           求人を作成
         </Link>
       </div>
-      <Suspense
-        fallback={
-          <div className="h-64 animate-pulse border-2 border-primary/30 bg-white" />
-        }
-      >
+      <Suspense>
         <JobPostingTable />
       </Suspense>
     </div>

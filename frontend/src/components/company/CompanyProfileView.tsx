@@ -4,10 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Pencil } from "lucide-react";
 import Link from "next/link";
 
-import {
-  CompanyProfileLayout,
-  CompanyProfileSkeleton,
-} from "@/components/companies/CompanyProfileSections";
+import { CompanyProfileLayout } from "@/components/companies/CompanyProfileSections";
 import { buttonClass } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { FormAlert } from "@/components/ui/FormAlert";
@@ -26,7 +23,7 @@ export function CompanyProfileView() {
   const jobPostings = useQuery(companyJobPostingsQueryOptions());
 
   if (profile.isPending || jobPostings.isPending) {
-    return <CompanyProfileSkeleton />;
+    return null;
   }
 
   if (profile.isError || jobPostings.isError) {
