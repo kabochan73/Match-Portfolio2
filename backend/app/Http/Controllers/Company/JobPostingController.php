@@ -10,6 +10,7 @@ use App\Http\Resources\JobPostingResource;
 use App\Models\Company;
 use App\Models\JobPosting;
 use App\Services\ImageStorage;
+use App\Services\NextRevalidator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
@@ -98,7 +99,7 @@ class JobPostingController extends Controller
     /**
      * 求人を編集する(公開中の求人も編集できる)
      */
-    public function update(JobPostingRequest $request, JobPosting $jobPosting): JobPostingResource
+    public function update(JobPostingRequest $request, JobPosting $jobPosting, NextRevalidator $revalidator): JobPostingResource
     {
         Gate::authorize('update', $jobPosting);
 
@@ -106,6 +107,8 @@ class JobPostingController extends Controller
             $jobPosting->update($request->jobPostingAttributes());
             $this->syncTags($jobPosting, $request);
         });
+
+        $revalidator->jobPostingChanged($jobPosting);
 
         return $this->show($jobPosting);
     }
@@ -115,7 +118,7 @@ class JobPostingController extends Controller
      *
      * @throws ValidationException
      */
-    public function destroy(JobPosting $jobPosting, ImageStorage $images): Response
+    public function destroy(JobPosting $jobPosting, ImageStorage $images, NextRevalidator $revalidator): Response
     {
         Gate::authorize('delete', $jobPosting);
 
@@ -142,6 +145,9 @@ class JobPostingController extends Controller
 
         // DBから削除できた後に、ストレージの画像ファイルを消す
         $imagePaths->each(fn (string $path) => $images->delete($path));
+
+        // 削除した求人は一覧・企業ページからも消える
+        $revalidator->jobPostingChanged($jobPosting, listChanged: true);
 
         return response()->noContent();
     }

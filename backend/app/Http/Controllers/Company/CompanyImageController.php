@@ -7,6 +7,7 @@ use App\Http\Resources\CompanyImageResource;
 use App\Models\Company;
 use App\Models\CompanyImage;
 use App\Services\ImageStorage;
+use App\Services\NextRevalidator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -32,7 +33,7 @@ class CompanyImageController extends Controller
      *
      * @throws ValidationException
      */
-    public function store(Request $request, ImageStorage $images): JsonResponse
+    public function store(Request $request, ImageStorage $images, NextRevalidator $revalidator): JsonResponse
     {
         $request->validate(
             ['image' => ['required', 'image', 'mimes:jpeg,png,webp', 'max:5120']],
@@ -53,18 +54,22 @@ class CompanyImageController extends Controller
             'path' => $images->storeResized($request->file('image'), 'company-images', self::MAX_WIDTH, self::MAX_HEIGHT),
         ]);
 
+        $revalidator->companyChanged($company);
+
         return (new CompanyImageResource($companyImage))->response()->setStatusCode(201);
     }
 
     /**
      * 写真を1枚削除する
      */
-    public function destroy(CompanyImage $companyImage, ImageStorage $images): Response
+    public function destroy(CompanyImage $companyImage, ImageStorage $images, NextRevalidator $revalidator): Response
     {
         Gate::authorize('delete', $companyImage);
 
         $companyImage->delete();
         $images->delete($companyImage->path);
+
+        $revalidator->companyChanged($companyImage->company);
 
         return response()->noContent();
     }

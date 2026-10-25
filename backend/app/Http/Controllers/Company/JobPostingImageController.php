@@ -7,6 +7,7 @@ use App\Http\Resources\JobPostingImageResource;
 use App\Models\JobPosting;
 use App\Models\JobPostingImage;
 use App\Services\ImageStorage;
+use App\Services\NextRevalidator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -32,7 +33,7 @@ class JobPostingImageController extends Controller
      *
      * @throws ValidationException
      */
-    public function store(Request $request, JobPosting $jobPosting, ImageStorage $images): JsonResponse
+    public function store(Request $request, JobPosting $jobPosting, ImageStorage $images, NextRevalidator $revalidator): JsonResponse
     {
         Gate::authorize('update', $jobPosting);
 
@@ -52,18 +53,22 @@ class JobPostingImageController extends Controller
             'path' => $images->storeResized($request->file('image'), 'job-posting-images', self::MAX_WIDTH, self::MAX_HEIGHT),
         ]);
 
+        $revalidator->jobPostingChanged($jobPosting);
+
         return (new JobPostingImageResource($jobPostingImage))->response()->setStatusCode(201);
     }
 
     /**
      * 画像を1枚削除する。URLの求人に属していない画像IDは、スコープ付きバインディングにより404になる
      */
-    public function destroy(JobPosting $jobPosting, JobPostingImage $image, ImageStorage $images): Response
+    public function destroy(JobPosting $jobPosting, JobPostingImage $image, ImageStorage $images, NextRevalidator $revalidator): Response
     {
         Gate::authorize('update', $jobPosting);
 
         $image->delete();
         $images->delete($image->path);
+
+        $revalidator->jobPostingChanged($jobPosting);
 
         return response()->noContent();
     }

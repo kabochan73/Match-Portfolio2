@@ -11,6 +11,7 @@ use App\Models\JobPosting;
 use App\Models\Like;
 use App\Models\User;
 use App\Services\LikeSender;
+use App\Services\NextRevalidator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -63,7 +64,7 @@ class LikeController extends Controller
     /**
      * 求人にいいねする(志望動機を添えて応募する)
      */
-    public function store(Request $request, JobPosting $jobPosting, LikeSender $sender): JsonResponse
+    public function store(Request $request, JobPosting $jobPosting, LikeSender $sender, NextRevalidator $revalidator): JsonResponse
     {
         // 下書きは公開APIと同じく、存在しないものとして扱う
         abort_if($jobPosting->status === JobPostingStatus::Draft, 404);
@@ -83,6 +84,9 @@ class LikeController extends Controller
             LikeType::from($validated['like_type']),
             $validated['motivation'],
         );
+
+        // 求人詳細・企業ページのいいね数を作り直す(求人一覧は5分ごとに作り直すため通知しない)
+        $revalidator->jobPostingChanged($jobPosting);
 
         return (new LikeResource($like))->response()->setStatusCode(201);
     }

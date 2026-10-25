@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Company\CompanyProfileRequest;
 use App\Http\Resources\CompanyResource;
 use App\Models\Company;
+use App\Services\NextRevalidator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -38,7 +39,7 @@ class ProfileController extends Controller
      * 企業ページの項目と、技術スタック・働き方の選択をまとめて更新する。
      * 途中で失敗して一部だけ更新された状態にならないよう、1つのトランザクションで行う
      */
-    public function update(CompanyProfileRequest $request): CompanyResource
+    public function update(CompanyProfileRequest $request, NextRevalidator $revalidator): CompanyResource
     {
         /** @var Company $company */
         $company = $request->user('company');
@@ -49,6 +50,8 @@ class ProfileController extends Controller
             $company->techStacks()->sync($request->validated('tech_stack_ids'));
             $company->workStyles()->sync($request->validated('work_style_ids'));
         });
+
+        $revalidator->companyChanged($company);
 
         return $this->show($request);
     }

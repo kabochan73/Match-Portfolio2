@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\JobPostingResource;
 use App\Models\JobPosting;
 use App\Services\JobPostingPublisher;
+use App\Services\NextRevalidator;
 use Illuminate\Support\Facades\Gate;
 
 /**
@@ -16,11 +17,12 @@ class JobPostingStatusController extends Controller
     /**
      * 公開する(下書きから、または募集終了からの再開)
      */
-    public function publish(JobPosting $jobPosting, JobPostingPublisher $publisher): JobPostingResource
+    public function publish(JobPosting $jobPosting, JobPostingPublisher $publisher, NextRevalidator $revalidator): JobPostingResource
     {
         Gate::authorize('update', $jobPosting);
 
         $publisher->publish($jobPosting);
+        $revalidator->jobPostingChanged($jobPosting, listChanged: true);
 
         return new JobPostingResource($jobPosting);
     }
@@ -28,11 +30,12 @@ class JobPostingStatusController extends Controller
     /**
      * 募集終了にする
      */
-    public function close(JobPosting $jobPosting, JobPostingPublisher $publisher): JobPostingResource
+    public function close(JobPosting $jobPosting, JobPostingPublisher $publisher, NextRevalidator $revalidator): JobPostingResource
     {
         Gate::authorize('update', $jobPosting);
 
         $publisher->close($jobPosting);
+        $revalidator->jobPostingChanged($jobPosting, listChanged: true);
 
         return new JobPostingResource($jobPosting);
     }
