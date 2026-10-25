@@ -22,7 +22,7 @@ class AvatarController extends Controller
     public function store(Request $request, ImageStorage $images): UserResource
     {
         $request->validate([
-            'avatar' => ['required', 'image', 'mimes:jpeg,png,webp', 'max:5120'],
+            'avatar' => ImageStorage::UPLOAD_RULES,
         ]);
 
         /** @var User $user */

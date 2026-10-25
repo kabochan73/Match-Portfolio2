@@ -36,7 +36,7 @@ return [
     'different' => ':attributeと:otherには、異なるものを指定してください。',
     'digits' => ':attributeは、:digits桁にしてください。',
     'digits_between' => ':attributeは、:min桁から:max桁にしてください。',
-    'dimensions' => ':attributeの画像サイズが無効です',
+    'dimensions' => ':attributeは、縦横:max_width×:max_heightピクセル以内の画像を選んでください。',
     'distinct' => ':attributeの値が重複しています。',
     'doesnt_contain' => ':attributeには、次のいずれも含めてはなりません: :values。',
     'doesnt_end_with' => ':attributeの終わりは「:values」以外である必要があります。',

@@ -20,6 +20,12 @@ use Intervention\Image\Interfaces\ImageInterface;
  */
 class ImageStorage
 {
+    /**
+     * アップロードを受け付ける画像の入力チェック(アイコン・ロゴ・ギャラリーで共通)。
+     * 縦横の上限は、巨大な画像の縮小でメモリを使い切らないための守り。画面からはブラウザで長辺2400pxに縮めてから送るため、ふつうは当たらない
+     */
+    public const UPLOAD_RULES = ['required', 'image', 'mimes:jpeg,png,webp', 'max:5120', 'dimensions:max_width=4000,max_height=4000'];
+
     private const WEBP_QUALITY = 80;
 
     /**

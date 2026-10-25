@@ -23,7 +23,7 @@ class AvatarController extends Controller
     public function store(Request $request, ImageStorage $images, NextRevalidator $revalidator): CompanyResource
     {
         $request->validate(
-            ['avatar' => ['required', 'image', 'mimes:jpeg,png,webp', 'max:5120']],
+            ['avatar' => ImageStorage::UPLOAD_RULES],
             attributes: ['avatar' => 'ロゴ画像'],
         );
 

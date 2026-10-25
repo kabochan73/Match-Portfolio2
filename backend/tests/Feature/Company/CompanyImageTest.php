@@ -30,6 +30,17 @@ describe('store', function () {
         expect(getimagesizefromstring(Storage::get($image->path)))->toMatchArray([0 => 1600, 1 => 1200]);
     });
 
+    it('returns 422 without saving an image larger than 4000px on a side', function () {
+        Storage::fake();
+        $this->actingAs(Company::factory()->create(), 'company');
+
+        uploadCompanyImage(UploadedFile::fake()->image('huge.jpg', 4001, 100))
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['image' => '写真は、縦横4000×4000ピクセル以内の画像を選んでください。']);
+
+        expect(Storage::allFiles())->toBe([]);
+    });
+
     it('returns 422 when the company already has 5 photos', function () {
         Storage::fake();
         $company = Company::factory()->create();

@@ -36,7 +36,7 @@ class CompanyImageController extends Controller
     public function store(Request $request, ImageStorage $images, NextRevalidator $revalidator): JsonResponse
     {
         $request->validate(
-            ['image' => ['required', 'image', 'mimes:jpeg,png,webp', 'max:5120']],
+            ['image' => ImageStorage::UPLOAD_RULES],
             attributes: ['image' => '写真'],
         );
 

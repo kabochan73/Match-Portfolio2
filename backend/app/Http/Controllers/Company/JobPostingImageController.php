@@ -38,7 +38,7 @@ class JobPostingImageController extends Controller
         Gate::authorize('update', $jobPosting);
 
         $request->validate(
-            ['image' => ['required', 'image', 'mimes:jpeg,png,webp', 'max:5120']],
+            ['image' => ImageStorage::UPLOAD_RULES],
             attributes: ['image' => '画像'],
         );
 
