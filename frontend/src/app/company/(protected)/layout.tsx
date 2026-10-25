@@ -14,7 +14,7 @@ export default function CompanyProtectedLayout({
   return (
     <>
       <CompanyAdminHeader />
-      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
         <Suspense fallback={<div className="h-64 animate-pulse bg-tint" />}>
           <RequireSignedIn as="company">{children}</RequireSignedIn>
         </Suspense>
