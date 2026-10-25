@@ -9,16 +9,18 @@ import { formatSalary } from "@/lib/jobs/format";
 
 type JobCardProps = {
   job: JobPostingSummary;
+  /** 押したときに開く画面(省略すると求人詳細。企業の求人管理では管理用の詳細を渡す) */
+  href?: string;
 };
 
 /**
- * 求人一覧・企業ページ・トップページの求人カード。カード全体が求人詳細へのリンクになる。
+ * 求人一覧・企業ページ・トップページ・求人管理の求人カード。カード全体がリンクになる。
  * 職種(最大3)・技術スタック(最大5)は数が限られているため、省略せずすべて表示する
  */
-export function JobCard({ job }: JobCardProps) {
+export function JobCard({ job, href = `/jobs/${job.id}` }: JobCardProps) {
   return (
     <Link
-      href={`/jobs/${job.id}`}
+      href={href}
       className="group flex h-full flex-col border-2 border-primary bg-white shadow-hard transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[8px_8px_0_var(--color-primary)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
     >
       <div className="relative aspect-video border-b-2 border-primary bg-page bg-[linear-gradient(var(--color-line-soft)_1px,transparent_1px),linear-gradient(90deg,var(--color-line-soft)_1px,transparent_1px)] bg-size-[20px_20px]">

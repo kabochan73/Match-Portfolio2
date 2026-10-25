@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Models\JobPosting;
+use App\Services\ImageStorage;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -48,6 +49,11 @@ class JobPostingResource extends JsonResource
             'job_categories' => JobCategoryResource::collection($this->whenLoaded('jobCategories')),
             'tech_stacks' => TechStackResource::collection($this->whenLoaded('techStacks')),
             'images' => JobPostingImageResource::collection($this->whenLoaded('images')),
+            // 求人管理の一覧のカードでのみ読み込む(画像がなければnull)
+            'cover_image_url' => $this->whenLoaded(
+                'coverImage',
+                fn () => app(ImageStorage::class)->url($this->coverImage?->path),
+            ),
             'likes_count' => $this->whenCounted('likes'),
             // 企業の反応待ち(applied)の件数。求人管理画面で対応漏れを知らせるために使う
             'pending_likes_count' => $this->whenCounted('pending_likes'),

@@ -1,9 +1,10 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { CircleAlert, Heart } from "lucide-react";
+import { CircleAlert } from "lucide-react";
 import Link from "next/link";
 
+import { JobCard } from "@/components/jobs/JobCard";
 import { buttonClass } from "@/components/ui/Button";
 import { FormAlert } from "@/components/ui/FormAlert";
 import type { CompanyJobPosting } from "@/lib/api/types";
@@ -13,7 +14,8 @@ import { UNEXPECTED_ERROR_MESSAGE } from "@/lib/forms/applyServerErrors";
 import { JobPostingStatusBadge } from "./JobPostingStatusBadge";
 
 /**
- * 求人管理の一覧(1行に1求人)。公開中の件数と上限を上に出し、反応待ちの応募がある求人は赤で知らせる
+ * 求人管理の一覧(求職者側と同じ求人カード。PCは2列)。公開中の件数と上限を上に出し、
+ * カードの上に状態と、反応待ちの応募がある場合はその件数を赤で出す
  */
 export function JobPostingTable() {
   const { data, isPending, isError } = useQuery(
@@ -41,9 +43,18 @@ export function JobPostingTable() {
       </p>
 
       {jobPostings.length > 0 ? (
-        <ul className="flex flex-col border-2 border-primary bg-white shadow-hard">
+        <ul className="grid gap-6 sm:grid-cols-2">
           {jobPostings.map((jobPosting) => (
-            <JobPostingRow key={jobPosting.id} jobPosting={jobPosting} />
+            <li key={jobPosting.id} className="flex flex-col gap-2">
+              <JobPostingBadges jobPosting={jobPosting} />
+              <JobCard
+                job={{
+                  ...jobPosting,
+                  cover_image_url: jobPosting.cover_image_url ?? null,
+                }}
+                href={`/company/job-postings/${jobPosting.id}`}
+              />
+            </li>
           ))}
         </ul>
       ) : (
@@ -63,49 +74,21 @@ export function JobPostingTable() {
   );
 }
 
-function JobPostingRow({ jobPosting }: { jobPosting: CompanyJobPosting }) {
+/** カードの上に出す、求人の状態と反応待ちの件数 */
+function JobPostingBadges({ jobPosting }: { jobPosting: CompanyJobPosting }) {
   return (
-    <li className="border-b-2 border-primary last:border-b-0">
-      <Link
-        href={`/company/job-postings/${jobPosting.id}`}
-        className="group grid gap-3 px-5 py-4 transition hover:bg-page md:grid-cols-[1fr_7rem_10rem] md:items-center"
-      >
-        <div className="flex min-w-0 flex-col gap-1.5">
-          <p className="truncate font-bold text-ink group-hover:underline group-hover:underline-offset-4">
-            {jobPosting.title}
-          </p>
-          <p className="truncate text-xs text-ink-sub">
-            {jobPosting.job_categories.map(({ name }) => name).join(" / ")}
-          </p>
-        </div>
-
-        <div>
-          <JobPostingStatusBadge status={jobPosting.status} />
-        </div>
-
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-          <span className="flex items-center gap-1 text-ink-body">
-            <Heart className="size-4 text-accent" aria-hidden />
-            応募
-            <span className="font-display font-bold">
-              {jobPosting.likes_count}
-            </span>
-            件
-          </span>
-          {/* 返事を忘れて期限切れにしないよう、反応待ちがある求人は赤で目立たせる */}
-          {jobPosting.pending_likes_count > 0 && (
-            <span className="flex items-center gap-1 font-bold text-accent">
-              <CircleAlert className="size-4" aria-hidden />
-              反応待ち
-              <span className="font-display">
-                {jobPosting.pending_likes_count}
-              </span>
-              件
-            </span>
-          )}
-        </div>
-      </Link>
-    </li>
+    <div className="flex min-h-6 flex-wrap items-center gap-3">
+      <JobPostingStatusBadge status={jobPosting.status} />
+      {/* 返事を忘れて期限切れにしないよう、反応待ちがある求人は赤で目立たせる */}
+      {jobPosting.pending_likes_count > 0 && (
+        <span className="flex items-center gap-1 text-sm font-bold text-accent">
+          <CircleAlert className="size-4" aria-hidden />
+          反応待ち
+          <span className="font-display">{jobPosting.pending_likes_count}</span>
+          件
+        </span>
+      )}
+    </div>
   );
 }
 
@@ -113,7 +96,14 @@ function JobPostingTableSkeleton() {
   return (
     <div className="flex animate-pulse flex-col gap-5">
       <div className="h-7 w-32 bg-tint" />
-      <div className="h-64 border-2 border-primary/30 bg-white" />
+      <div className="grid gap-6 sm:grid-cols-2">
+        {Array.from({ length: 4 }, (_, index) => (
+          <div
+            key={index}
+            className="h-80 border-2 border-primary/30 bg-white"
+          />
+        ))}
+      </div>
     </div>
   );
 }

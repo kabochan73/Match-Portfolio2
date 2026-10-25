@@ -29,7 +29,7 @@ class JobPostingController extends Controller
     private const FOREIGN_KEY_VIOLATION = '23503';
 
     /**
-     * 自社の求人一覧(すべての状態)。更新日時の新しい順。
+     * 自社の求人一覧(すべての状態)。更新日時の新しい順。カードで見せるため、技術スタックとカバー画像も含める。
      * metaに公開中の件数と上限を含める(求人管理画面の「公開中 3 / 10件」の表示に使う)
      */
     public function index(Request $request): AnonymousResourceCollection
@@ -38,7 +38,11 @@ class JobPostingController extends Controller
         $company = $request->user('company');
 
         $jobPostings = $company->jobPostings()
-            ->with(['jobCategories' => fn ($query) => $query->orderBy('sort_order')])
+            ->with([
+                'jobCategories' => fn ($query) => $query->orderBy('sort_order'),
+                'techStacks' => fn ($query) => $query->orderBy('sort_order'),
+                'coverImage',
+            ])
             ->withCount($this->likeCounts())
             ->orderByDesc('updated_at')
             ->orderByDesc('id')

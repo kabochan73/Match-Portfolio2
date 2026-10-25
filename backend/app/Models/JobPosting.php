@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * 求人(求人票)
@@ -115,6 +116,16 @@ class JobPosting extends Model
     public function images(): HasMany
     {
         return $this->hasMany(JobPostingImage::class);
+    }
+
+    /**
+     * カバー画像(ギャラリーの1枚目)。求人管理の一覧のカードで使う
+     *
+     * @return HasOne<JobPostingImage, $this>
+     */
+    public function coverImage(): HasOne
+    {
+        return $this->hasOne(JobPostingImage::class)->oldestOfMany();
     }
 
     /**

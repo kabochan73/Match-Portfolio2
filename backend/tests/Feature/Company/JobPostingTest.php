@@ -39,6 +39,26 @@ describe('index', function () {
             ->assertJsonPath('data.0.pending_likes_count', 1);
     });
 
+    it('includes the tech stacks and the first image as the cover for the cards', function () {
+        $company = Company::factory()->create();
+        $withImages = JobPosting::factory()->for($company)->create(['updated_at' => now()]);
+        $first = JobPostingImage::factory()->for($withImages)->create();
+        JobPostingImage::factory()->for($withImages)->create();
+        $techStacks = TechStack::factory()->count(2)->sequence(['sort_order' => 2], ['sort_order' => 1])->create();
+        $withImages->techStacks()->attach($techStacks);
+        JobPosting::factory()->for($company)->create(['updated_at' => now()->subDay()]);
+
+        $this->actingAs($company, 'company')
+            ->getJson('/api/company/job-postings')
+            ->assertOk()
+            ->assertJsonPath('data.0.cover_image_url', Storage::url($first->path))
+            ->assertJsonPath('data.0.tech_stacks.0.id', $techStacks[1]->id)
+            ->assertJsonPath('data.0.tech_stacks.1.id', $techStacks[0]->id)
+            ->assertJsonMissingPath('data.0.images')
+            // 画像のない求人はnull
+            ->assertJsonPath('data.1.cover_image_url', null);
+    });
+
     it('returns the number of published postings and the limit in meta', function () {
         $company = Company::factory()->create();
         JobPosting::factory()->count(3)->published()->for($company)->create();

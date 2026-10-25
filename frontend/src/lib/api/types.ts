@@ -147,9 +147,11 @@ export type CompanyJobPosting = {
   is_new: boolean;
   updated_at: string;
   job_categories: JobCategory[];
+  tech_stacks: TechStack[];
   /** 詳細でのみ含まれる */
-  tech_stacks?: TechStack[];
   images?: Image[];
+  /** 一覧でのみ含まれる(カードのカバー画像。画像がなければnull) */
+  cover_image_url?: string | null;
   likes_count: number;
   /** 企業の返事を待っている応募の数 */
   pending_likes_count: number;
