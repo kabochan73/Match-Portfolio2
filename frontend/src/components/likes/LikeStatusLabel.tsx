@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils/cn";
 import { daysUntil, formatMonthDay } from "@/lib/utils/date";
 
 /** 残り何日から赤で知らせるか */
-const URGENT_DAYS = 1;
+const URGENT_DAYS = 3;
 
 type LikeStatusLabelProps = {
   /** 求職者のいいね・企業が受け取ったいいねの両方で使う */
