@@ -11,7 +11,7 @@
   /* 赤: NEW・通知バッジ・いいね数など、気づいてほしい要所だけに使う */
   --color-accent: #c93f35;
 
-  /* 水色: 薄い順に ページ背景 / カードの見出し帯 / ヒーロー */
+  /* 水色: 薄い順に 面(行のホバー・画像のない枠・案内の箱など) / カードの見出し帯 / ヒーロー */
   --color-page: #eef6fc;
   --color-tint: #dceef9;
   --color-tint-strong: #cfe7f6;
@@ -40,8 +40,9 @@
     var(--font-space-grotesk), var(--font-zen-kaku-gothic-new), sans-serif;
 }
 
+/* ページの地は白。水色(page・tint)は、帯や面などの要所にだけ使う */
 body {
-  background-color: var(--color-page);
+  background-color: var(--color-white);
   color: var(--color-ink);
   font-family: var(--font-sans);
 }
