@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>ER図</title>
+<!-- README用ER図の元データ。ブラウザで開き、#canvasを画像として保存する -->
+<style>
+  body { margin: 0; background: #fff; font-family: "Hiragino Sans", "Noto Sans JP", sans-serif; }
+  #canvas { position: relative; width: 1610px; height: 1010px; background: #fff; }
+  svg { position: absolute; inset: 0; }
+  .tbl { position: absolute; background: #fff; border: 1.5px solid #334155; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 6px rgba(15, 23, 42, .12); }
+  .tbl h3 { margin: 0; height: 38px; line-height: 38px; padding: 0 12px; font-size: 14px; font-weight: 700; color: #0f172a; background: #e8edf3; border-bottom: 1.5px solid #334155; letter-spacing: .02em; }
+  .row { display: grid; grid-template-columns: 26px 1fr 72px var(--note-w, 70px); align-items: center; height: 26px; padding: 0 10px 0 6px; font-size: 12px; border-top: 1px solid #e5e7eb; column-gap: 6px; }
+  .tbl h3 + .row { border-top: none; }
+  .name { color: #0f172a; }
+  .type { color: #64748b; }
+  .note { color: #64748b; font-size: 10.5px; text-align: right; white-space: nowrap; }
+  .badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 1px 5px; border-radius: 4px; white-space: nowrap; }
+  .pk { background: #dbeafe; color: #1d4ed8; }
+  .fk { background: #dcfce7; color: #15803d; }
+  .uk { background: #ede9fe; color: #6d28d9; }
+  .key { font-size: 11px; text-align: center; }
+  .lbl { position: absolute; font-size: 12px; font-weight: 700; color: #0f172a; background: #fff; padding: 0 3px; white-space: nowrap; }
+  .card { position: absolute; font-size: 11px; font-weight: 700; color: #0f172a; }
+  .footnote { position: absolute; font-size: 12px; color: #475569; line-height: 1.7; }
+</style>
+</head>
+<body>
+<div id="canvas"><svg id="lines" width="1610" height="1010"></svg></div>
+<script>
+// [列名, 型, キー(PK/FK/UK/PK,FK), 補足]
+const tables = {
+  users: { x: 30, y: 40, w: 300, cols: [
+    ['id', 'bigint', 'PK'], ['name', 'string'], ['email', 'string', 'UK'], ['birth_date', 'date'],
+    ['comment', 'string'], ['portfolio_url', 'string'], ['avatar_path', 'string'],
+  ] },
+  work_experiences: { x: 460, y: 20, w: 320, noteW: 74, cols: [
+    ['id', 'bigint', 'PK'], ['user_id', 'bigint', 'FK'], ['company_name', 'string'],
+    ['started_on', 'date'], ['ended_on', 'date', '', 'nullは在籍中'], ['employment_type', 'string'],
+  ] },
+  educations: { x: 460, y: 240, w: 320, cols: [
+    ['id', 'bigint', 'PK'], ['user_id', 'bigint', 'FK'], ['school_name', 'string'],
+  ] },
+  certifications: { x: 460, y: 382, w: 320, cols: [
+    ['id', 'bigint', 'PK'], ['user_id', 'bigint', 'FK'], ['name', 'string'],
+  ] },
+  likes: { x: 250, y: 545, w: 460, noteW: 210, cols: [
+    ['id', 'bigint', 'PK'], ['user_id', 'bigint', 'FK'], ['job_posting_id', 'bigint', 'FK'],
+    ['like_type', 'string', '', 'standard / super'], ['motivation', 'text', '', '志望動機'],
+    ['status', 'string', '', 'applied / matched / declined / expired'],
+    ['response_deadline', 'timestamp', '', 'いいねから7日'], ['responded_at', 'timestamp'],
+  ] },
+  bookmarks: { x: 340, y: 830, w: 340, cols: [
+    ['id', 'bigint', 'PK'], ['user_id', 'bigint', 'FK'], ['job_posting_id', 'bigint', 'FK'], ['created_at', 'timestamp'],
+  ] },
+  companies: { x: 820, y: 40, w: 380, cols: [
+    ['id', 'bigint', 'PK'], ['name', 'string'], ['email', 'string', 'UK'], ['avatar_path', 'string'],
+    ['introduction', 'string'], ['business_description', 'text'], ['culture', 'text'],
+    ['founded_year', 'smallint'], ['member_count', 'int'], ['prefecture', 'string'],
+  ] },
+  job_postings: { x: 820, y: 440, w: 380, noteW: 150, cols: [
+    ['id', 'bigint', 'PK'], ['company_id', 'bigint', 'FK'], ['title', 'string'], ['description', 'text'],
+    ['employment_type', 'string'], ['prefecture', 'string'], ['salary', 'int', '', '月給(円)'],
+    ['selection_steps', 'jsonb', '', '選考フロー'], ['status', 'string', '', 'draft / published / closed'],
+    ['published_at', 'timestamp'],
+  ] },
+  company_images: { x: 1260, y: 30, w: 320, cols: [
+    ['id', 'bigint', 'PK'], ['company_id', 'bigint', 'FK'], ['path', 'string'],
+  ] },
+  company_tech_stack: { x: 1260, y: 180, w: 320, cols: [
+    ['company_id', 'bigint', 'PK,FK'], ['tech_stack_id', 'bigint', 'PK,FK'],
+  ] },
+  company_work_style: { x: 1260, y: 300, w: 320, cols: [
+    ['company_id', 'bigint', 'PK,FK'], ['work_style_id', 'bigint', 'PK,FK'],
+  ] },
+  job_posting_images: { x: 1260, y: 430, w: 320, cols: [
+    ['id', 'bigint', 'PK'], ['job_posting_id', 'bigint', 'FK'], ['path', 'string'],
+  ] },
+  job_posting_job_category: { x: 1260, y: 566, w: 320, cols: [
+    ['job_posting_id', 'bigint', 'PK,FK'], ['job_category_id', 'bigint', 'PK,FK'],
+  ] },
+  job_posting_tech_stack: { x: 1260, y: 676, w: 320, cols: [
+    ['job_posting_id', 'bigint', 'PK,FK'], ['tech_stack_id', 'bigint', 'PK,FK'],
+  ] },
+};
+
+const HEADER = 38, ROW = 26;
+const canvas = document.getElementById('canvas');
+const svg = document.getElementById('lines');
+
+for (const [name, t] of Object.entries(tables)) {
+  t.h = HEADER + ROW * t.cols.length + 3;
+  const el = document.createElement('div');
+  el.className = 'tbl';
+  Object.assign(el.style, { left: t.x + 'px', top: t.y + 'px', width: t.w + 'px' });
+  if (t.noteW) el.style.setProperty('--note-w', t.noteW + 'px');
+  el.innerHTML = `<h3>${name.toUpperCase()}</h3>` + t.cols.map(([col, type, key = '', note = '']) => {
+    const icon = key.includes('PK') ? '🔑' : key === 'FK' ? '<span class="badge fk">FK</span>' : '';
+    const right = note ? `<span class="note">${note}</span>`
+      : key && key !== 'FK' ? key.split(',').map((k) => `<span class="badge ${k.toLowerCase()}">${k}</span>`).join(' ') : '';
+    return `<div class="row"><span class="key">${icon}</span><span class="name">${col}</span><span class="type">${type}</span><span class="note">${right}</span></div>`;
+  }).join('');
+  canvas.appendChild(el);
+}
+
+const NS = 'http://www.w3.org/2000/svg';
+function path(d) {
+  const p = document.createElementNS(NS, 'path');
+  p.setAttribute('d', d);
+  p.setAttribute('fill', 'none');
+  p.setAttribute('stroke', '#334155');
+  p.setAttribute('stroke-width', '1.5');
+  svg.appendChild(p);
+}
+function text(x, y, s, cls) {
+  const el = document.createElement('div');
+  el.className = cls;
+  el.textContent = s;
+  Object.assign(el.style, { left: x + 'px', top: y + 'px' });
+  canvas.appendChild(el);
+}
+
+// 端の記号。(x, y)が表に接する点、(dx, dy)は線が表に入っていく向き
+function one(x, y, dx, dy) {
+  const nx = -dy, ny = dx;
+  for (const off of [8, 13]) {
+    const bx = x - dx * off, by = y - dy * off;
+    path(`M${bx + nx * 7},${by + ny * 7} L${bx - nx * 7},${by - ny * 7}`);
+  }
+}
+function many(x, y, dx, dy) {
+  const nx = -dy, ny = dx;
+  const bx = x - dx * 12, by = y - dy * 12;
+  path(`M${bx},${by} L${x + nx * 7},${y + ny * 7} M${bx},${by} L${x - nx * 7},${y - ny * 7}`);
+  const c = document.createElementNS(NS, 'circle');
+  c.setAttribute('cx', x - dx * 18); c.setAttribute('cy', y - dy * 18); c.setAttribute('r', 4.5);
+  c.setAttribute('fill', '#fff'); c.setAttribute('stroke', '#334155'); c.setAttribute('stroke-width', '1.5');
+  svg.appendChild(c);
+}
+const dir = (a, b) => { const dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy); return [dx / l, dy / l]; };
+
+// pts: 親(1)側から子(多)側への折れ線
+function rel(pts, label, lx, ly) {
+  path('M' + pts.map((p) => p.join(',')).join(' L'));
+  const [s, s2] = pts, e = pts[pts.length - 1], e2 = pts[pts.length - 2];
+  const [sx, sy] = dir(s2, s); one(s[0], s[1], sx, sy);
+  const [ex, ey] = dir(e2, e); many(e[0], e[1], ex, ey);
+  if (label) text(lx, ly, label, 'lbl');
+}
+
+const T = tables;
+const R = (t) => t.x + t.w, B = (t) => t.y + t.h, at = (t) => t.y + 52;
+
+// 求職者まわり
+rel([[R(T.users), 70], [385, 70], [385, at(T.work_experiences)], [T.work_experiences.x, at(T.work_experiences)]], '職歴', 398, at(T.work_experiences) - 22);
+rel([[R(T.users), 70], [385, 70], [385, at(T.educations)], [T.educations.x, at(T.educations)]], '学歴', 398, at(T.educations) - 22);
+rel([[R(T.users), 70], [385, 70], [385, at(T.certifications)], [T.certifications.x, at(T.certifications)]], '資格', 398, at(T.certifications) - 22);
+rel([[160, B(T.users)], [160, at(T.likes)], [T.likes.x, at(T.likes)]], 'いいね(応募)', 166, at(T.likes) - 24);
+rel([[100, B(T.users)], [100, at(T.bookmarks)], [T.bookmarks.x, at(T.bookmarks)]], 'ブックマーク', 170, at(T.bookmarks) - 24);
+
+// 企業まわり
+rel([[R(T.companies), at(T.company_images)], [T.company_images.x, at(T.company_images)]], '写真', 1208, at(T.company_images) - 24);
+rel([[R(T.companies), at(T.company_tech_stack)], [T.company_tech_stack.x, at(T.company_tech_stack)]]);
+rel([[R(T.companies), at(T.company_work_style)], [T.company_work_style.x, at(T.company_work_style)]]);
+rel([[900, B(T.companies)], [900, T.job_postings.y]], '求人', 910, (B(T.companies) + T.job_postings.y) / 2 - 9);
+
+// 求人まわり
+rel([[R(T.job_postings), at(T.job_posting_images)], [T.job_posting_images.x, at(T.job_posting_images)]], '画像', 1208, at(T.job_posting_images) - 24);
+rel([[R(T.job_postings), at(T.job_posting_job_category)], [T.job_posting_job_category.x, at(T.job_posting_job_category)]]);
+rel([[R(T.job_postings), at(T.job_posting_tech_stack)], [T.job_posting_tech_stack.x, at(T.job_posting_tech_stack)]]);
+rel([[T.job_postings.x, 700], [R(T.likes), 700]], '受け取ったいいね', 716, 676);
+rel([[980, B(T.job_postings)], [980, B(T.bookmarks) - 40], [R(T.bookmarks), B(T.bookmarks) - 40]], 'ブックマーク', 990, B(T.bookmarks) - 66);
+
+const note = document.createElement('div');
+note.className = 'footnote';
+Object.assign(note.style, { left: '1260px', top: '820px', width: '330px' });
+note.innerHTML = '🔑 主キー　<span class="badge fk">FK</span> 外部キー　<span class="badge uk">UK</span> ユニーク<br>'
+  + '線の端: 縦棒2本 = 1、丸＋三叉 = 0以上(多)<br>'
+  + '職種・技術スタック・働き方のマスタテーブル(job_categories / tech_stacks / work_styles)、通知(notifications)は省略';
+canvas.appendChild(note);
+</script>
+</body>
+</html>
